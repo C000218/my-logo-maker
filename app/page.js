@@ -1,10 +1,10 @@
 'use client';
-import '@ant-design/v5-patch-for-react-19'; // 添加这行
+import '@ant-design/v5-patch-for-react-19';
 import { useState } from 'react';
 import { Form, Input, Select, Button, Card, DatePicker, Divider, Typography, message } from 'antd';
 import dayjs from 'dayjs';
 import { getLogoDesign } from '@/lib/designRules';
-import LogoPreview from '@/components/LogoPreview'; // 导入Logo预览组件
+import LogoPreview from '@/components/LogoPreview';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -181,9 +181,9 @@ export default function LogoGenerator() {
               <Title level={5}>设计配置</Title>
               <Divider />
               <p><strong>形状:</strong> {designConfig.shape}</p>
-              <p><strong>布局:</strong> {designConfig.style.layout}</p>
-              <p><strong>复杂度:</strong> {designConfig.style.complexity}</p>
-              <p><strong>图标:</strong> {designConfig.icon || '无'}</p>
+              <p><strong>布局:</strong> {designConfig.layout}</p> {/* 修改这里 */}
+              {/* 移除复杂度和图标的显示 */}
+              <p><strong>底部文本:</strong> {designConfig.footerText || 'Bionic Metamaterials'}</p> {/* 添加底部文本显示 */}
             </div>
             
             <div>
