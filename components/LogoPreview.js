@@ -14,18 +14,17 @@ const LogoPreview = ({ designConfig }) => {
     setIsClient(true);
   }, []);
 
-  // 如果没有设计配置或设计配置不完整，显示加载状态
-  if (!designConfig || !designConfig.text) {
+  // 如果没有设计配置，显示加载状态
+  if (!designConfig) {
     return <div>正在准备Logo预览...</div>;
   }
 
   // 从 designConfig 中解构值，并提供默认值
   const { 
-    text = "", 
+    layout = "1x1", 
     shape = "circle", 
-    colors = { primary: "#1890ff", secondary: "#f0f5ff", accent: "#096dd9" }, 
-    icon = "star", 
-    style = { layout: "centered", complexity: "simple" }
+    colors = { primary: "#1890ff", secondary: "#f0f5ff", accent: "#096dd9" },
+    footerText = "Bionic Metamaterials"
   } = designConfig;
 
   // 下载Logo功能
@@ -41,7 +40,7 @@ const LogoPreview = ({ designConfig }) => {
       });
 
       const link = document.createElement('a');
-      link.download = `${text || "logo"}.png`;
+      link.download = `bionic-logo.png`;
       link.href = dataUrl;
       link.click();
     } catch (err) {
@@ -54,110 +53,109 @@ const LogoPreview = ({ designConfig }) => {
   }
 
   // 根据形状生成不同的SVG路径
-  const renderShape = () => {
-    const size = 200;
+  const renderShape = (fillColor = colors.primary) => {
+    const size = 40; // 单个基元的大小
     const center = size / 2;
     
     switch(shape) {
       case 'circle':
-        return <circle cx={center} cy={center} r={center - 10} fill={colors.primary} />;
+        return <circle cx={center} cy={center} r={center - 2} fill={fillColor} />;
       case 'square':
-        return <rect x="10" y="10" width={size - 20} height={size - 20} fill={colors.primary} rx="15" />;
+        return <rect x="2" y="2" width={size - 4} height={size - 4} fill={fillColor} rx="4" />;
       case 'triangle':
         return <polygon 
-          points={`${center},10 ${size - 10},${size - 10} 10,${size - 10}`} 
-          fill={colors.primary} 
+          points={`${center},2 ${size - 2},${size - 2} 2,${size - 2}`} 
+          fill={fillColor} 
         />;
       case 'heart':
         return <path 
-          d={`M${center},${center - 40} C${center + 60},${center - 80} ${center + 80},${center - 20} ${center},${center + 40} C${center - 80},${center - 20} ${center - 60},${center - 80} ${center},${center - 40}`} 
-          fill={colors.primary} 
+          d={`M${center},${center - 8} C${center + 12},${center - 16} ${center + 16},${center - 4} ${center},${center + 8} C${center - 16},${center - 4} ${center - 12},${center - 16} ${center},${center - 8}`} 
+          fill={fillColor} 
         />;
       case 'star':
         return <path 
-          d={`M${center},10 L${center + 20},${center - 20} L${center + 40},${center - 10} L${center + 30},${center + 10} L${center + 40},${center + 30} L${center},${center + 20} L${center - 40},${center + 30} L${center - 30},${center + 10} L${center - 40},${center - 10} L${center - 20},${center - 20} Z`} 
-          fill={colors.primary} 
+          d={`M${center},2 L${center + 4},${center - 4} L${center + 8},${center - 2} L${center + 6},${center + 2} L${center + 8},${center + 6} L${center},${center + 4} L${center - 8},${center + 6} L${center - 6},${center + 2} L${center - 8},${center - 2} L${center - 4},${center - 4} Z`} 
+          fill={fillColor} 
+        />;
+      case 'diamond':
+        return <polygon 
+          points={`${center},2 ${size - 2},${center} ${center},${size - 2} 2,${center}`} 
+          fill={fillColor} 
+        />;
+      case 'pentagon':
+        return <polygon 
+          points={`${center},2 ${size - 2},${center - 4} ${size - 4},${size - 2} 4,${size - 2} 2,${center - 4}`} 
+          fill={fillColor} 
+        />;
+      case 'hexagon':
+        return <polygon 
+          points={`${center - 8},2 ${center + 8},2 ${size - 2},${center} ${center + 8},${size - 2} ${center - 8},${size - 2} 2,${center}`} 
+          fill={fillColor} 
+        />;
+      case 'cloud':
+        return <path 
+          d={`M${center - 10},${center} C${center - 12},${center - 6} ${center - 8},${center - 10} ${center},${center - 10} C${center + 8},${center - 10} ${center + 12},${center - 6} ${center + 10},${center} C${center + 14},${center} ${center + 16},${center + 4} ${center + 12},${center + 8} C${center + 8},${center + 12} ${center + 4},${center + 14} ${center},${center + 14} C${center - 4},${center + 14} ${center - 8},${center + 12} ${center - 12},${center + 8} C${center - 16},${center + 4} ${center - 14},${center} ${center - 10},${center} Z`} 
+          fill={fillColor} 
+        />;
+      case 'leaf':
+        return <path 
+          d={`M${center},2 C${center - 4},${center - 4} ${center - 12},${center - 6} ${center - 14},${center} C${center - 16},${center + 6} ${center - 10},${center + 12} ${center},${size - 2} C${center + 10},${center + 12} ${center + 16},${center + 6} ${center + 14},${center} C${center + 12},${center - 6} ${center + 4},${center - 4} ${center},2 Z`} 
+          fill={fillColor} 
+        />;
+      case 'moon':
+        return <path 
+          d={`M${center},2 C${center + 8},2 ${center + 14},8 ${center + 14},${center} C${center + 14},${center + 8} ${center + 8},${size - 2} ${center},${size - 2} C${center - 4},${size - 2} ${center - 8},${size - 6} ${center - 8},${center} C${center - 8},${center - 6} ${center - 4},2 ${center},2 Z`} 
+          fill={fillColor} 
+        />;
+      case 'snowflake':
+        return <path 
+          d={`M${center},2 L${center},${size - 2} M${center - 8},${center - 8} L${center + 8},${center + 8} M${center - 8},${center + 8} L${center + 8},${center - 8} M2,${center} L${size - 2},${center}`} 
+          stroke={fillColor} 
+          strokeWidth="2" 
+          fill="none" 
         />;
       default:
-        return <circle cx={center} cy={center} r={center - 10} fill={colors.primary} />;
+        return <circle cx={center} cy={center} r={center - 2} fill={fillColor} />;
     }
   };
 
-  // 根据布局决定文字排列方式
-  const renderText = () => {
-    // 确保 text 有值
-    const displayText = text || "";
-    
-    switch(style.layout) {
-      case 'side-by-side':
-        return (
-          <text 
-            x="50%" 
-            y="50%" 
-            textAnchor="middle" 
-            dy="0.3em" 
-            fill={colors.accent}
-            fontSize="32"
-            fontWeight="bold"
-          >
-            {displayText}
-          </text>
-        );
-      case 'stacked':
-        // 确保 text 有值再调用 split
-        return displayText.split('').map((char, index) => (
-          <text 
-            key={index}
-            x="50%" 
-            y={`${40 + index * 30}%`} 
-            textAnchor="middle" 
-            fill={colors.accent}
-            fontSize="28"
-            fontWeight="bold"
-          >
-            {char}
-          </text>
-        ));
-      case 'centered':
-      default:
-        return (
-          <text 
-            x="50%" 
-            y="50%" 
-            textAnchor="middle" 
-            dy="0.3em" 
-            fill={colors.accent}
-            fontSize="40"
-            fontWeight="bold"
-          >
-            {displayText}
-          </text>
-        );
-    }
+  // 解析布局字符串，如 "2x3"
+  const parseLayout = () => {
+    const [rows, cols] = layout.split('x').map(Number);
+    return { rows, cols, total: rows * cols };
   };
 
-  // 简单图标映射
-  const renderIcon = () => {
-    if (!icon || icon === 'none') return null;
+  // 渲染基元图案网格
+  const renderPatternGrid = () => {
+    const { rows, cols, total } = parseLayout();
+    const cellSize = 200 / Math.max(rows, cols); // 根据行列数调整单元格大小
     
-    const iconSize = 30;
-    const iconY = style.layout === 'stacked' ? 75 : 50;
-    
-    // 这里可以扩展更多图标
-    switch(icon) {
-      case 'heart':
-        return <path 
-          d={`M${100 - iconSize/2},${iconY - iconSize/2} C${100 + iconSize/2},${iconY - iconSize} ${100 + iconSize},${iconY - iconSize/4} ${100},${iconY + iconSize/2} C${100 - iconSize},${iconY - iconSize/4} ${100 - iconSize/2},${iconY - iconSize} ${100 - iconSize/2},${iconY - iconSize/2}`} 
-          fill={colors.accent} 
-        />;
-      case 'star':
-        return <path 
-          d={`M${100},${iconY - iconSize} L${100 + iconSize/4},${iconY - iconSize/4} L${100 + iconSize},${iconY} L${100 + iconSize/4},${iconY + iconSize/4} L${100},${iconY + iconSize} L${100 - iconSize/4},${iconY + iconSize/4} L${100 - iconSize},${iconY} L${100 - iconSize/4},${iconY - iconSize/4} Z`} 
-          fill={colors.accent} 
-        />;
-      default:
-        return <circle cx="100" cy={iconY} r={iconSize/3} fill={colors.accent} />;
-    }
+    return (
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: `repeat(${cols}, 1fr)`,
+        gridTemplateRows: `repeat(${rows}, 1fr)`,
+        gap: '8px',
+        width: '100%',
+        height: '100%',
+        alignItems: 'center',
+        justifyItems: 'center'
+      }}>
+        {Array.from({ length: total }, (_, index) => (
+          <div key={index} style={{
+            width: `${cellSize}px`,
+            height: `${cellSize}px`,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}>
+            <svg width={cellSize} height={cellSize} viewBox={`0 0 40 40`}>
+              {renderShape()}
+            </svg>
+          </div>
+        ))}
+      </div>
+    );
   };
 
   return (
@@ -167,21 +165,31 @@ const LogoPreview = ({ designConfig }) => {
         style={{
           display: 'inline-block',
           backgroundColor: colors.secondary,
-          padding: '20px',
+          padding: '30px',
           borderRadius: '10px',
-          marginBottom: '20px'
+          marginBottom: '20px',
+          width: '250px',
+          height: '250px',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center'
         }}
       >
-        <svg 
-          width="200" 
-          height="200" 
-          viewBox="0 0 200 200"
-          style={{ display: 'block' }}
-        >
-          {renderShape()}
-          {renderText()}
-          {renderIcon()}
-        </svg>
+        {/* 基元图案网格 */}
+        <div style={{ width: '200px', height: '200px' }}>
+          {renderPatternGrid()}
+        </div>
+        
+        {/* 底部文本 */}
+        <div style={{ 
+          marginTop: '10px',
+          color: colors.accent,
+          fontSize: '12px',
+          fontWeight: 'bold'
+        }}>
+          {footerText}
+        </div>
       </div>
       
       <div>
@@ -198,7 +206,7 @@ const LogoPreview = ({ designConfig }) => {
       </div>
       
       <div style={{ marginTop: '20px', fontSize: '14px', color: '#666' }}>
-        <p>形状: {shape} | 布局: {style.layout} | 图标: {icon || '无'}</p>
+        <p>布局: {layout} | 形状: {shape}</p>
         <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <div style={{
