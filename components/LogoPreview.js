@@ -4,7 +4,6 @@ import { useRef, useEffect, useState, useCallback } from 'react';
 import { Button, Space } from 'antd';
 import { DownloadOutlined } from '@ant-design/icons';
 import { toPng } from 'html-to-image';
-import Image from 'next/image';
 
 const LogoPreview = ({ designConfig }) => {
   const logoRef = useRef(null);
@@ -17,6 +16,11 @@ const LogoPreview = ({ designConfig }) => {
     setIsClient(true);
   }, []);
 
+  // 如果没有设计配置，显示加载状态
+  if (!designConfig) {
+    return <div>正在准备Logo预览...</div>;
+  }
+
   // 从 designConfig 中解构值，并提供默认值
   const { 
     layout = "1x1", 
@@ -28,12 +32,156 @@ const LogoPreview = ({ designConfig }) => {
     symmetry = 4,
     complexity = 2,
     features = [5, 5, 5]
-  } = designConfig || {};
+  } = designConfig;
 
-  // 使用useCallback包装生成图案的函数，避免不必要的重新创建
-  const generatePattern = useCallback(() => {
-    if (!designConfig) return;
+  // 图案绘制函数 - 使用 useCallback 包装
+  const drawSpecialCross = useCallback((ctx, symmetry, complexity, f1, f2, f3, primaryColor, secondaryColor) => {
+    const centerX = 100;
+    const centerY = 100;
+    const branchLength = 60 + 10 * complexity;
+    const branchWidth = 4 + complexity;
     
+    const branchAngle = 10 * f1 / 10;
+    const secondaryRatio = 0.4 + 0.2 * f2 / 10;
+    
+    ctx.strokeStyle = primaryColor;
+    ctx.lineWidth = branchWidth;
+    ctx.lineCap = 'round';
+    
+    // 绘制四个主分支
+    ctx.beginPath();
+    ctx.moveTo(centerX, centerY);
+    ctx.lineTo(centerX, centerY - branchLength);
+    ctx.stroke();
+    
+    ctx.beginPath();
+    ctx.moveTo(centerX, centerY);
+    ctx.lineTo(centerX, centerY + branchLength);
+    ctx.stroke();
+    
+    ctx.beginPath();
+    ctx.moveTo(centerX, centerY);
+    ctx.lineTo(centerX + branchLength, centerY);
+    ctx.stroke();
+    
+    ctx.beginPath();
+    ctx.moveTo(centerX, centerY);
+    ctx.lineTo(centerX - branchLength, centerY);
+    ctx.stroke();
+    
+    // 绘制次级分支
+    const secondaryLength = branchLength * secondaryRatio;
+    const secondaryWidth = branchWidth * 0.7;
+    ctx.lineWidth = secondaryWidth;
+    
+    // 上分支的次级分支
+    ctx.beginPath();
+    ctx.moveTo(centerX, centerY - branchLength);
+    ctx.lineTo(centerX + secondaryLength, centerY - branchLength);
+    ctx.stroke();
+    
+    ctx.beginPath();
+    ctx.moveTo(centerX, centerY - branchLength);
+    ctx.lineTo(centerX - secondaryLength, centerY - branchLength);
+    ctx.stroke();
+    
+    // 下分支的次级分支
+    ctx.beginPath();
+    ctx.moveTo(centerX, centerY + branchLength);
+    ctx.lineTo(centerX + secondaryLength, centerY + branchLength);
+    ctx.stroke();
+    
+    ctx.beginPath();
+    ctx.moveTo(centerX, centerY + branchLength);
+    ctx.lineTo(centerX - secondaryLength, centerY + branchLength);
+    ctx.stroke();
+    
+    // 右分支的次级分支
+    ctx.beginPath();
+    ctx.moveTo(centerX + branchLength, centerY);
+    ctx.lineTo(centerX + branchLength, centerY + secondaryLength);
+    ctx.stroke();
+    
+    ctx.beginPath();
+    ctx.moveTo(centerX + branchLength, centerY);
+    ctx.lineTo(centerX + branchLength, centerY - secondaryLength);
+    ctx.stroke();
+    
+    // 左分支的次级分支
+    ctx.beginPath();
+    ctx.moveTo(centerX - branchLength, centerY);
+    ctx.lineTo(centerX - branchLength, centerY + secondaryLength);
+    ctx.stroke();
+    
+    ctx.beginPath();
+    ctx.moveTo(centerX - branchLength, centerY);
+    ctx.lineTo(centerX - branchLength, centerY - secondaryLength);
+    ctx.stroke();
+    
+    // 添加中心点
+    const centerSize = 5 + f3;
+    ctx.fillStyle = 'gold';
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, centerSize, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // 添加额外分支
+    if (complexity > 3 && f3 > 7) {
+      for (let i = 0; i < 4; i++) {
+        const angle = 45 + i * 90;
+        const tertiaryLength = branchLength * 0.3;
+        const endX = centerX + tertiaryLength * Math.cos(angle * Math.PI / 180);
+        const endY = centerY + tertiaryLength * Math.sin(angle * Math.PI / 180);
+        
+        ctx.beginPath();
+        ctx.moveTo(centerX, centerY);
+        ctx.lineTo(endX, endY);
+        ctx.stroke();
+      }
+    }
+  }, []);
+
+  // 其他图案绘制函数 - 使用 useCallback 包装
+  const drawSierpinskiCarpet = useCallback((ctx, symmetry, complexity, f1, f2, f3, primaryColor, secondaryColor) => {
+    const level = Math.min(complexity, 4);
+    const baseSize = 120;
+    const gapFactor = 0.05 * f1 / 10;
+    
+    // 绘制基础正方形
+    ctx.fillStyle = primaryColor;
+    ctx.fillRect(40, 40, baseSize, baseSize);
+    
+    // 递归函数生成分形结构
+    const createFractal = (x, y, size, currentLevel) => {
+      if (currentLevel <= 0) return;
+      
+      const subSize = size / 3;
+      const gap = subSize * gapFactor;
+      
+      // 创建中心空洞
+      ctx.fillStyle = colors.secondary;
+      ctx.fillRect(x + subSize, y + subSize, subSize, subSize);
+      
+      // 如果不是最底层，继续递归
+      if (currentLevel > 1) {
+        const positions = [
+          [x, y], [x + subSize, y], [x + 2 * subSize, y],
+          [x, y + subSize], [x + 2 * subSize, y + subSize],
+          [x, y + 2 * subSize], [x + subSize, y + 2 * subSize], [x + 2 * subSize, y + 2 * subSize]
+        ];
+        
+        for (const [posX, posY] of positions) {
+          createFractal(posX, posY, subSize, currentLevel - 1);
+        }
+      }
+    };
+    
+    // 生成分形结构
+    createFractal(40, 40, baseSize, level);
+  }, [colors.secondary]);
+
+  // 使用useCallback包装生成图案的函数，包含所有必要的依赖项
+  const generatePattern = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     
@@ -78,7 +226,7 @@ const LogoPreview = ({ designConfig }) => {
     
     // 将Canvas转换为图片URL
     setPatternImage(canvas.toDataURL('image/png'));
-  }, [designConfig, colors.accent, colors.primary, colors.secondary, complexity, features, patternType, symmetry]);
+  }, [colors, complexity, features, patternType, symmetry, drawSpecialCross, drawSierpinskiCarpet]);
 
   // 当designConfig变化时，生成图案
   useEffect(() => {
@@ -86,11 +234,6 @@ const LogoPreview = ({ designConfig }) => {
       generatePattern();
     }
   }, [designConfig, generatePattern]);
-
-  // 如果没有设计配置，显示加载状态
-  if (!designConfig) {
-    return <div>正在准备Logo预览...</div>;
-  }
 
   // 下载Logo功能
   const handleDownload = async () => {
@@ -117,15 +260,7 @@ const LogoPreview = ({ designConfig }) => {
     return <div>正在准备Logo预览...</div>;
   }
 
-  // 图案绘制函数
-  const drawSpecialCross = (ctx, symmetry, complexity, f1, f2, f3, primaryColor, secondaryColor) => {
-    // 实现保持不变...
-  };
-
-  const drawSierpinskiCarpet = (ctx, symmetry, complexity, f1, f2, f3, primaryColor, secondaryColor) => {
-    // 实现保持不变...
-  };
-
+  // 其他图案绘制函数保持不变...
   const drawSquareResonator = (ctx, symmetry, complexity, f1, f2, f3, primaryColor, secondaryColor) => {
     // 实现保持不变...
   };
@@ -262,13 +397,7 @@ const LogoPreview = ({ designConfig }) => {
         {/* 基元图案网格 */}
         <div style={{ width: '200px', height: '200px' }}>
           {patternImage ? (
-            <Image 
-              src={patternImage} 
-              alt="Generated Pattern" 
-              width={200}
-              height={200}
-              style={{ width: '100%', height: '100%' }}
-            />
+            <img src={patternImage} alt="Generated Pattern" style={{ width: '100%', height: '100%' }} />
           ) : (
             <canvas
               ref={canvasRef}
