@@ -182,7 +182,7 @@ export default function LogoGenerator() {
               <Divider />
               <p><strong>形状:</strong> {designConfig.shape}</p>
               <p><strong>布局:</strong> {designConfig.layout}</p>
-              <p><strong>图案类型:</strong> {designConfig.patternType}</p>
+              <p><strong>图案类型:</strong> {designConfig.patternName}</p>
               <p><strong>对称性:</strong> {designConfig.symmetry}重</p>
               <p><strong>复杂度:</strong> {designConfig.complexity}级</p>
               <p><strong>特征参数:</strong> {designConfig.features?.join(', ')}</p>

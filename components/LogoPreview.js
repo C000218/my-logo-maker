@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useCallback } from 'react';
 import { Button, Space } from 'antd';
 import { DownloadOutlined } from '@ant-design/icons';
 import { toPng } from 'html-to-image';
@@ -35,13 +35,14 @@ const LogoPreview = ({ designConfig }) => {
     colors = { primary: "#1890ff", secondary: "#f0f5ff", accent: "#096dd9" },
     footerText = "Bionic Metamaterials",
     patternType = 0,
+    patternName = "特殊十字",
     symmetry = 4,
     complexity = 2,
     features = [5, 5, 5]
   } = designConfig;
 
-  // 生成图案
-  const generatePattern = () => {
+  // 使用useCallback包装生成图案的函数，避免不必要的重新创建
+  const generatePattern = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     
@@ -86,7 +87,7 @@ const LogoPreview = ({ designConfig }) => {
     
     // 将Canvas转换为图片URL
     setPatternImage(canvas.toDataURL('image/png'));
-  };
+  }, [designConfig]);
 
   // 下载Logo功能
   const handleDownload = async () => {
@@ -113,7 +114,7 @@ const LogoPreview = ({ designConfig }) => {
     return <div>正在准备Logo预览...</div>;
   }
 
-  // 图案绘制函数 - 更准确地转换Python代码
+  // 图案绘制函数
   const drawSpecialCross = (ctx, symmetry, complexity, f1, f2, f3, primaryColor, secondaryColor) => {
     const centerX = 100;
     const centerY = 100;
@@ -220,6 +221,7 @@ const LogoPreview = ({ designConfig }) => {
     }
   };
 
+  // 其他图案绘制函数（简化实现）
   const drawSierpinskiCarpet = (ctx, symmetry, complexity, f1, f2, f3, primaryColor, secondaryColor) => {
     const level = Math.min(complexity, 4);
     const baseSize = 120;
@@ -256,19 +258,6 @@ const LogoPreview = ({ designConfig }) => {
     
     // 生成分形结构
     createFractal(40, 40, baseSize, level);
-    
-    // 添加局部特征 - 额外空洞
-    if (f3 > 5) {
-      for (let i = 0; i < Math.min(f3 - 5, 4); i++) {
-        const angle = i * Math.PI / 2;
-        const holeX = 100 + 50 * Math.cos(angle);
-        const holeY = 100 + 50 * Math.sin(angle);
-        const holeSize = 10 + 5 * f2 / 10;
-        
-        ctx.fillStyle = colors.secondary;
-        ctx.fillRect(holeX - holeSize/2, holeY - holeSize/2, holeSize, holeSize);
-      }
-    }
   };
 
   const drawSquareResonator = (ctx, symmetry, complexity, f1, f2, f3, primaryColor, secondaryColor) => {
@@ -335,17 +324,6 @@ const LogoPreview = ({ designConfig }) => {
       gapWidth, 
       gapHeight
     );
-    
-    // 添加局部特征 - 额外缺口
-    if (f3 > 5) {
-      const extraGapSize = 10;
-      ctx.fillRect(
-        100 - extraGapSize/2, 
-        40 + outerSize - extraGapSize/2, 
-        extraGapSize, 
-        extraGapSize
-      );
-    }
   };
 
   const drawFishnet = (ctx, symmetry, complexity, f1, f2, f3, primaryColor, secondaryColor) => {
@@ -395,29 +373,6 @@ const LogoPreview = ({ designConfig }) => {
       ctx.lineTo(xPos, centerY + armLength/2);
       ctx.stroke();
     }
-    
-    // 添加局部特征 - 对角线
-    if (diagonalLines) {
-      ctx.setLineDash([5, 5]);
-      ctx.beginPath();
-      ctx.moveTo(centerX - armLength/2, centerY - armLength/2);
-      ctx.lineTo(centerX + armLength/2, centerY + armLength/2);
-      ctx.stroke();
-      
-      ctx.beginPath();
-      ctx.moveTo(centerX - armLength/2, centerY + armLength/2);
-      ctx.lineTo(centerX + armLength/2, centerY - armLength/2);
-      ctx.stroke();
-      ctx.setLineDash([]);
-    }
-    
-    // 添加局部特征 - 中心点
-    if (f3 > 7) {
-      ctx.fillStyle = secondaryColor;
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, armWidth * 2, 0, Math.PI * 2);
-      ctx.fill();
-    }
   };
 
   const drawSquareSpiral = (ctx, symmetry, complexity, f1, f2, f3, primaryColor, secondaryColor) => {
@@ -427,7 +382,6 @@ const LogoPreview = ({ designConfig }) => {
     const lineWidth = 2;
     
     const gapSize = 2 * f1 / 10;
-    const cornerRadius = 5 * f2 / 10;
     
     const centerX = 100;
     const centerY = 100;
@@ -472,23 +426,6 @@ const LogoPreview = ({ designConfig }) => {
     }
     
     ctx.stroke();
-    
-    // 添加局部特征 - 缺口
-    if (f3 > 5) {
-      for (let i = 0; i < Math.min(f3 - 5, 4); i++) {
-        const angle = i * Math.PI / 2;
-        const gapX = 100 + 80 * Math.cos(angle);
-        const gapY = 100 + 80 * Math.sin(angle);
-        
-        ctx.fillStyle = colors.secondary;
-        ctx.fillRect(
-          gapX - gapSize/2, 
-          gapY - gapSize/2, 
-          gapSize, 
-          gapSize
-        );
-      }
-    }
   };
 
   const drawNestedSquares = (ctx, symmetry, complexity, f1, f2, f3, primaryColor, secondaryColor) => {
@@ -497,7 +434,6 @@ const LogoPreview = ({ designConfig }) => {
     const sizeReduction = 20 / complexity;
     
     const rotationAngle = 10 * f1 / 10;
-    const gapFactor = 0.05 * f2 / 10;
     
     const centerX = 100;
     const centerY = 100;
@@ -519,23 +455,7 @@ const LogoPreview = ({ designConfig }) => {
       ctx.lineWidth = 2 + (numSquares - i) * 0.5;
       ctx.strokeRect(-halfSize, -halfSize, size, size);
       
-      // 添加间隙（每隔一个方形添加）
-      if (i % 2 === 0 && gapFactor > 0) {
-        const gapSize = size * gapFactor;
-        ctx.fillStyle = colors.secondary;
-        ctx.fillRect(-gapSize/2, -gapSize/2, gapSize, gapSize);
-      }
-      
       ctx.restore();
-    }
-    
-    // 添加局部特征 - 中心点
-    if (f3 > 5) {
-      const centerSize = 3 + f3 % 5;
-      ctx.fillStyle = secondaryColor;
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, centerSize, 0, Math.PI * 2);
-      ctx.fill();
     }
   };
 
@@ -544,7 +464,6 @@ const LogoPreview = ({ designConfig }) => {
     const lineWidth = 6 + complexity;
     
     const gapSize = 20 * f1 / 10;
-    const spacing = 10 * f2 / 10;
     
     ctx.strokeStyle = primaryColor;
     ctx.lineWidth = lineWidth;
@@ -585,17 +504,6 @@ const LogoPreview = ({ designConfig }) => {
     ctx.moveTo(150, 130);
     ctx.lineTo(150, 130 - gapSize/2);
     ctx.stroke();
-    
-    // 添加局部特征 - 连接线
-    if (f3 > 5) {
-      const connectLength = 20 + 10 * f3 / 10;
-      ctx.strokeStyle = secondaryColor;
-      ctx.lineWidth = lineWidth * 0.7;
-      ctx.beginPath();
-      ctx.moveTo(100 + spacing, 100);
-      ctx.lineTo(100 + connectLength, 100);
-      ctx.stroke();
-    }
   };
 
   const drawGreekCross = (ctx, symmetry, complexity, f1, f2, f3, primaryColor, secondaryColor) => {
@@ -604,7 +512,6 @@ const LogoPreview = ({ designConfig }) => {
     const centerSize = 30;
     
     const armExtension = 10 * f1 / 10;
-    const notchSize = 5 * f2 / 10;
     
     const centerX = 100;
     const centerY = 100;
@@ -633,23 +540,6 @@ const LogoPreview = ({ designConfig }) => {
       centerSize, 
       centerSize
     );
-    
-    // 添加局部特征 - 凹口
-    if (f3 > 5) {
-      for (let i = 0; i < 4; i++) {
-        const angle = i * 90;
-        const notchX = centerX + (armLength/2 + armExtension/2) * Math.cos(angle * Math.PI / 180);
-        const notchY = centerY + (armLength/2 + armExtension/2) * Math.sin(angle * Math.PI / 180);
-        
-        ctx.fillStyle = colors.secondary;
-        ctx.fillRect(
-          notchX - notchSize/2, 
-          notchY - notchSize/2, 
-          notchSize, 
-          notchSize
-        );
-      }
-    }
   };
 
   // 解析布局字符串，如 "2x3"
@@ -706,53 +596,38 @@ const LogoPreview = ({ designConfig }) => {
           points={`${center},2 ${size - 2},${size - 2} 2,${size - 2}`} 
           fill={fillColor} 
         />;
-      case 'heart':
-        return <path 
-          d={`M${center},${center - 8} C${center + 12},${center - 16} ${center + 16},${center - 4} ${center},${center + 8} C${center - 16},${center - 4} ${center - 12},${center - 16} ${center},${center - 8}`} 
-          fill={fillColor} 
-        />;
-      case 'star':
-        return <path 
-          d={`M${center},2 L${center + 4},${center - 4} L${center + 8},${center - 2} L${center + 6},${center + 2} L${center + 8},${center + 6} L${center},${center + 4} L${center - 8},${center + 6} L${center - 6},${center + 2} L${center - 8},${center - 2} L${center - 4},${center - 4} Z`} 
-          fill={fillColor} 
-        />;
-      case 'diamond':
-        return <polygon 
-          points={`${center},2 ${size - 2},${center} ${center},${size - 2} 2,${center}`} 
-          fill={fillColor} 
-        />;
-      case 'pentagon':
-        return <polygon 
-          points={`${center},2 ${size - 2},${center - 4} ${size - 4},${size - 2} 4,${size - 2} 2,${center - 4}`} 
-          fill={fillColor} 
-        />;
-      case 'hexagon':
-        return <polygon 
-          points={`${center - 8},2 ${center + 8},2 ${size - 2},${center} ${center + 8},${size - 2} ${center - 8},${size - 2} 2,${center}`} 
-          fill={fillColor} 
-        />;
-      case 'cloud':
-        return <path 
-          d={`M${center - 10},${center} C${center - 12},${center - 6} ${center - 8},${center - 10} ${center},${center - 10} C${center + 8},${center - 10} ${center + 12},${center - 6} ${center + 10},${center} C${center + 14},${center} ${center + 16},${center + 4} ${center + 12},${center + 8} C${center + 8},${center + 12} ${center + 4},${center + 14} ${center},${center + 14} C${center - 4},${center + 14} ${center - 8},${center + 12} ${center - 12},${center + 8} C${center - 16},${center + 4} ${center - 14},${center} ${center - 10},${center} Z`} 
-          fill={fillColor} 
-        />;
-      case 'leaf':
-        return <path 
-          d={`M${center},2 C${center - 4},${center - 4} ${center - 12},${center - 6} ${center - 14},${center} C${center - 16},${center + 6} ${center - 10},${center + 12} ${center},${size - 2} C${center + 10},${center + 12} ${center + 16},${center + 6} ${center + 14},${center} C${center + 12},${center - 6} ${center + 4},${center - 4} ${center},2 Z`} 
-          fill={fillColor} 
-        />;
-      case 'moon':
-        return <path 
-          d={`M${center},2 C${center + 8},2 ${center + 14},8 ${center + 14},${center} C${center + 14},${center + 8} ${center + 8},${size - 2} ${center},${size - 2} C${center - 4},${size - 2} ${center - 8},${size - 6} ${center - 8},${center} C${center - 8},${center - 6} ${center - 4},2 ${center},2 Z`} 
-          fill={fillColor} 
-        />;
-      case 'snowflake':
-        return <path 
-          d={`M${center},2 L${center},${size - 2} M${center - 8},${center - 8} L${center + 8},${center + 8} M${center - 8},${center + 8} L${center + 8},${center - 8} M2,${center} L${size - 2},${center}`} 
-          stroke={fillColor} 
-          strokeWidth="2" 
-          fill="none" 
-        />;
+      case 'cross':
+        return (
+          <g fill={fillColor}>
+            <rect x={center - 4} y="2" width="8" height={size - 4} />
+            <rect x="2" y={center - 4} width={size - 4} height="8" />
+          </g>
+        );
+      case 'grid':
+        return (
+          <g stroke={fillColor} strokeWidth="2" fill="none">
+            <line x1="2" y1={center} x2={size - 2} y2={center} />
+            <line x1={center} y1="2" x2={center} y2={size - 2} />
+          </g>
+        );
+      case 'spiral':
+        return (
+          <path 
+            d="M20,2 Q30,10 20,18 Q10,10 20,2" 
+            fill="none" 
+            stroke={fillColor} 
+            strokeWidth="2"
+          />
+        );
+      case 'cshape':
+        return (
+          <path 
+            d="M30,10 C25,5 15,5 10,10 C5,15 5,25 10,30 C15,35 25,35 30,30" 
+            fill="none" 
+            stroke={fillColor} 
+            strokeWidth="2"
+          />
+        );
       default:
         return <circle cx={center} cy={center} r={center - 2} fill={fillColor} />;
     }
@@ -815,8 +690,8 @@ const LogoPreview = ({ designConfig }) => {
       </div>
       
       <div style={{ marginTop: '20px', fontSize: '14px', color: '#666' }}>
-        <p>布局: {layout} | 形状: {shape}</p>
-        <p>图案类型: {patternType} | 对称性: {symmetry}重 | 复杂度: {complexity}级</p>
+        <p>布局: {layout} | 图案: {patternName}</p>
+        <p>对称性: {symmetry}重 | 复杂度: {complexity}级</p>
         <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <div style={{
