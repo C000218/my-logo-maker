@@ -29,7 +29,7 @@ export default function LogoGenerator() {
       setLogoData(formattedData);
       
       // 使用设计规则引擎生成设计配置
-      const config = getLogoDesign(formattedData);
+      const config = await getLogoDesign(formattedData);
       setDesignConfig(config);
       
       message.success('Logo生成成功！');
@@ -178,15 +178,12 @@ export default function LogoGenerator() {
             </div>
             
             <div>
-              <Title level={5}>设计配置</Title>
+              <Title level={5}>图案配置</Title>
               <Divider />
-              <p><strong>形状:</strong> {designConfig.shape}</p>
-              <p><strong>布局:</strong> {designConfig.layout}</p>
-              <p><strong>图案类型:</strong> {designConfig.patternName}</p>
+              <p><strong>图案类型:</strong> {patternNames[designConfig.patternType] || "特殊十字"}</p>
               <p><strong>对称性:</strong> {designConfig.symmetry}重</p>
               <p><strong>复杂度:</strong> {designConfig.complexity}级</p>
-              <p><strong>特征参数:</strong> {designConfig.features?.join(', ')}</p>
-              <p><strong>底部文本:</strong> {designConfig.footerText || 'Bionic Metamaterials'}</p>
+              <p><strong>布局:</strong> {designConfig.layout}</p>
             </div>
             
             <div>
