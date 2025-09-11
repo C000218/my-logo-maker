@@ -479,7 +479,7 @@ const LogoPreview = ({ designConfig, initials }) => {
         display: 'grid',
         gridTemplateColumns: `repeat(${cols}, 1fr)`,
         gridTemplateRows: `repeat(${rows}, 1fr)`,
-        gap: '1px', // 进一步减少间隔到1px
+        gap: '0px', // 完全消除间隔
         width: '100%',
         height: '100%',
         alignItems: 'center',
@@ -491,9 +491,15 @@ const LogoPreview = ({ designConfig, initials }) => {
             height: `${cellSize}px`,
             display: 'flex',
             justifyContent: 'center',
-            alignItems: 'center'
+            alignItems: 'center',
+            overflow: 'hidden' // 防止图案溢出
           }}>
-            <svg width={cellSize} height={cellSize} viewBox="0 0 200 200">
+            <svg 
+              width={cellSize} 
+              height={cellSize} 
+              viewBox="0 0 200 200"
+              style={{ transform: 'scale(1.1)' }} // 稍微放大图案
+            >
               {renderPattern()}
             </svg>
           </div>
@@ -509,7 +515,7 @@ const LogoPreview = ({ designConfig, initials }) => {
         style={{
           display: 'inline-block',
           backgroundColor: colors.secondary,
-          padding: '15px', // 进一步减少内边距
+          padding: '10px', // 最小化内边距
           borderRadius: '8px',
           marginBottom: '20px',
           width: '250px',
@@ -517,19 +523,24 @@ const LogoPreview = ({ designConfig, initials }) => {
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
-          alignItems: 'center'
+          alignItems: 'center',
+          boxSizing: 'border-box'
         }}
       >
         {/* 基元图案网格 */}
-        <div style={{ width: '210px', height: '210px' }}> {/* 稍微增加内部容器大小 */}
+        <div style={{ 
+          width: '230px', // 最大化内部容器大小
+          height: '230px',
+          boxSizing: 'border-box'
+        }}>
           {renderPatternGrid()}
         </div>
         
         {/* 底部文本 */}
         <div style={{ 
-          marginTop: '5px', // 进一步减少上边距
+          marginTop: '5px',
           color: colors.accent,
-          fontSize: '11px', // 稍微减小字体大小
+          fontSize: '11px',
           fontWeight: 'bold'
         }}>
           {footerText}
@@ -551,7 +562,7 @@ const LogoPreview = ({ designConfig, initials }) => {
       
       <div style={{ marginTop: '15px', fontSize: '13px', color: '#666' }}>
         <p>图案: {patternNames[patternType] || "特殊十字"} | 对称性: {symmetry}重 | 复杂度: {complexity}级</p>
-        <p>布局: {getLayout()}</p>
+        <p>布局: {getLayout()} {initials && `(缩写: ${initials})`}</p>
         <div style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <div style={{
