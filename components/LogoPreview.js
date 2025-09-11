@@ -88,7 +88,6 @@ const LogoPreview = ({ designConfig }) => {
     const centerY = 100;
     const branchLength = 40 + 5 * complexity;
     const branchWidth = 4 + complexity;
-    const branchAngle = 10 * f1 / 10;
     const secondaryRatio = 0.4 + 0.2 * f2 / 10;
     const secondaryLength = branchLength * secondaryRatio;
     const secondaryWidth = branchWidth * 0.7;
@@ -144,45 +143,91 @@ const LogoPreview = ({ designConfig }) => {
     );
   };
 
-  // 其他图案渲染函数（这里只实现了特殊十字，其他图案需要类似实现）
+  // 其他图案渲染函数（简化版）
   const renderSierpinskiCarpet = (symmetry, complexity, f1, f2, f3, colors) => {
-    // 实现谢尔宾斯基地毯
+    // 简化的谢尔宾斯基地毯实现
+    const size = 100;
+    const level = Math.min(complexity, 3);
+    
+    const drawSierpinski = (x, y, size, level) => {
+      if (level === 0) return null;
+      
+      const newSize = size / 3;
+      const elements = [];
+      
+      // 中心空洞
+      elements.push(
+        <rect key={`${x}-${y}`} x={x + newSize} y={y + newSize} width={newSize} height={newSize} 
+              fill={colors.secondary} stroke={colors.secondary} />
+      );
+      
+      // 递归绘制8个周边区域
+      if (level > 1) {
+        const positions = [
+          [x, y], [x + newSize, y], [x + 2 * newSize, y],
+          [x, y + newSize], [x + 2 * newSize, y + newSize],
+          [x, y + 2 * newSize], [x + newSize, y + 2 * newSize], [x + 2 * newSize, y + 2 * newSize]
+        ];
+        
+        positions.forEach(([posX, posY]) => {
+          elements.push(...drawSierpinski(posX, posY, newSize, level - 1));
+        });
+      }
+      
+      return elements;
+    };
+    
     return (
       <g>
-        <rect x="50" y="50" width="100" height="100" fill={colors.primary} />
-        <rect x="75" y="75" width="50" height="50" fill={colors.secondary} />
-        <text x="100" y="100" textAnchor="middle" fill={colors.accent}>
-          谢尔宾斯基地毯
-        </text>
+        <rect x="50" y="50" width={size} height={size} fill={colors.primary} />
+        {drawSierpinski(50, 50, size, level)}
       </g>
     );
   };
 
+  // 方形谐振环
   const renderSquareResonator = (symmetry, complexity, f1, f2, f3, colors) => {
-    // 实现方形谐振环
+    const outerSize = 80;
+    const innerSize = 50;
+    const thickness = 8 + complexity * 2;
+    
     return (
       <g>
-        <rect x="50" y="50" width="100" height="100" fill="none" stroke={colors.primary} strokeWidth="4" />
-        <rect x="60" y="60" width="80" height="80" fill="none" stroke={colors.primary} strokeWidth="2" />
-        <text x="100" y="100" textAnchor="middle" fill={colors.accent}>
-          方形谐振环
-        </text>
+        {/* 外环 */}
+        <rect x={100 - outerSize/2} y={100 - outerSize/2} 
+              width={outerSize} height={outerSize} 
+              fill="none" stroke={colors.primary} strokeWidth={thickness} />
+        
+        {/* 内环 */}
+        <rect x={100 - innerSize/2} y={100 - innerSize/2} 
+              width={innerSize} height={innerSize} 
+              fill="none" stroke={colors.primary} strokeWidth={thickness/2} />
+        
+        {/* 缺口 */}
+        <line x1={100 + outerSize/2 - 10} y1={100 - 5} 
+              x2={100 + outerSize/2 - 10} y2={100 + 5} 
+              stroke={colors.secondary} strokeWidth={thickness + 2} />
+        
+        <line x1={100 - outerSize/2 + 10} y1={100 - 5} 
+              x2={100 - outerSize/2 + 10} y2={100 + 5} 
+              stroke={colors.secondary} strokeWidth={thickness + 2} />
       </g>
     );
   };
 
   // 其他图案函数类似实现...
+  // 为节省空间，这里只实现了3种图案，您可以根据需要添加更多
 
   // 解析布局字符串，如 "2x3"
   const parseLayout = () => {
     const [rows, cols] = layout.split('x').map(Number);
-    return { rows, cols, total: rows * cols };
+    return { rows: rows || 1, cols: cols || 1, total: (rows || 1) * (cols || 1) };
   };
 
   // 渲染基元图案网格
   const renderPatternGrid = () => {
     const { rows, cols, total } = parseLayout();
-    const cellSize = 200 / Math.max(rows, cols);
+    const cellSize = 200 / Math.max(rows, cols, 1);
     
     return (
       <div style={{
