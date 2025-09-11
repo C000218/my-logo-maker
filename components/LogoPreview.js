@@ -458,6 +458,14 @@ const LogoPreview = ({ designConfig, initials }) => {
     if (initials && initials.length === 2) {
       return "2x2";
     }
+    // 如果 initials 是3个字母，使用2x2布局（最后一个位置留空）
+    if (initials && initials.length === 3) {
+      return "2x2";
+    }
+    // 如果 initials 是4个字母，使用2x2布局
+    if (initials && initials.length === 4) {
+      return "2x2";
+    }
     // 否则使用配置的布局
     return layout;
   };
@@ -562,7 +570,7 @@ const LogoPreview = ({ designConfig, initials }) => {
       
       <div style={{ marginTop: '15px', fontSize: '13px', color: '#666' }}>
         <p>图案: {patternNames[patternType] || "特殊十字"} | 对称性: {symmetry}重 | 复杂度: {complexity}级</p>
-        <p>布局: {getLayout()} {initials && `(缩写: ${initials})`}</p>
+        <p>布局: {getLayout()} {initials && `(缩写: ${initials}, 长度: ${initials.length})`}</p>
         <div style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <div style={{
