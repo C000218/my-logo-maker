@@ -479,7 +479,7 @@ const LogoPreview = ({ designConfig, initials }) => {
         display: 'grid',
         gridTemplateColumns: `repeat(${cols}, 1fr)`,
         gridTemplateRows: `repeat(${rows}, 1fr)`,
-        gap: '4px', // 减少间隔从8px到4px
+        gap: '1px', // 进一步减少间隔到1px
         width: '100%',
         height: '100%',
         alignItems: 'center',
@@ -509,8 +509,8 @@ const LogoPreview = ({ designConfig, initials }) => {
         style={{
           display: 'inline-block',
           backgroundColor: colors.secondary,
-          padding: '20px', // 减少内边距
-          borderRadius: '10px',
+          padding: '15px', // 进一步减少内边距
+          borderRadius: '8px',
           marginBottom: '20px',
           width: '250px',
           height: '250px',
@@ -521,15 +521,15 @@ const LogoPreview = ({ designConfig, initials }) => {
         }}
       >
         {/* 基元图案网格 */}
-        <div style={{ width: '200px', height: '200px' }}>
+        <div style={{ width: '210px', height: '210px' }}> {/* 稍微增加内部容器大小 */}
           {renderPatternGrid()}
         </div>
         
         {/* 底部文本 */}
         <div style={{ 
-          marginTop: '8px', // 减少上边距
+          marginTop: '5px', // 进一步减少上边距
           color: colors.accent,
-          fontSize: '12px',
+          fontSize: '11px', // 稍微减小字体大小
           fontWeight: 'bold'
         }}>
           {footerText}
@@ -549,37 +549,37 @@ const LogoPreview = ({ designConfig, initials }) => {
         </Space>
       </div>
       
-      <div style={{ marginTop: '20px', fontSize: '14px', color: '#666' }}>
+      <div style={{ marginTop: '15px', fontSize: '13px', color: '#666' }}>
         <p>图案: {patternNames[patternType] || "特殊十字"} | 对称性: {symmetry}重 | 复杂度: {complexity}级</p>
         <p>布局: {getLayout()}</p>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <div style={{
-              width: '16px',
-              height: '16px',
+              width: '14px',
+              height: '14px',
               backgroundColor: colors.primary,
-              marginRight: '5px',
-              borderRadius: '3px'
+              marginRight: '4px',
+              borderRadius: '2px'
             }}></div>
             主色
           </div>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <div style={{
-              width: '16px',
-              height: '16px',
+              width: '14px',
+              height: '14px',
               backgroundColor: colors.secondary,
-              marginRight: '5px',
-              borderRadius: '3px'
+              marginRight: '4px',
+              borderRadius: '2px'
             }}></div>
             背景色
           </div>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <div style={{
-              width: '16px',
-              height: '16px',
+              width: '14px',
+              height: '14px',
               backgroundColor: colors.accent,
-              marginRight: '5px',
-              borderRadius: '3px'
+              marginRight: '4px',
+              borderRadius: '2px'
             }}></div>
             强调色
           </div>
