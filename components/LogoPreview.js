@@ -16,7 +16,7 @@ import {
   drawNestedSquares,
   drawDoubleCOpening,
   drawGreekCross
-} from '@/utils/patternGenerators';
+} from '@/lib/patternGenerators';
 
 const LogoPreview = ({ designConfig }) => {
   // 首先声明所有Hook - 这是修复的关键
