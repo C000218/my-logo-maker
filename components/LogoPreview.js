@@ -462,7 +462,7 @@ const drawDoubleCOpening = (ctx, symmetry, complexity, f1, f2, f3, primaryColor,
   ctx.moveTo(100, 70);
   ctx.lineTo(100, 130);
   // 左侧开口线（与缩短线连接）
-  ctx.moveTo(50, 极速版70);
+  ctx.moveTo(50, 70);
   ctx.lineTo(50, 70 + gapSize/2);
   ctx.moveTo(50, 130);
   ctx.lineTo(50, 130 - gapSize/2);
@@ -483,7 +483,7 @@ const drawDoubleCOpening = (ctx, symmetry, complexity, f1, f2, f3, primaryColor,
   ctx.moveTo(150, 70);
   ctx.lineTo(150, 70 + gapSize/2);
   ctx.moveTo(150, 130);
-  ctx.lineTo(150, 130 -极速版 gapSize/2);
+  ctx.lineTo(150, 130 -gapSize/2);
   ctx.stroke();
   
   // 添加局部特征 - 连接线
@@ -504,7 +504,7 @@ const drawGreekCross = (ctx, symmetry, complexity, f1, f2, f3, primaryColor, sec
   const armWidth = 15;
   const centerSize = 30;
   
-  const armExtension = 10 *极速版 f1 / 10;
+  const armExtension = 10 *f1 / 10;
   const notchSize = 5 * f2 / 10;
   
   const centerX = 100;
@@ -593,13 +593,13 @@ const LogoPreview = ({ designConfig }) => {
         drawSpecialCross(ctx, symmetry, complexity, f1, f2, f3, primaryColor, accentColor);
         break;
       case 1:
-        drawSierpinskiCarpet(ctx, symmetry, complexity, f1,极速版 f2, f3, primaryColor, accentColor, secondaryColor);
+        drawSierpinskiCarpet(ctx, symmetry, complexity, f1, f2, f3, primaryColor, accentColor, secondaryColor);
         break;
       case 2:
         drawSquareResonator(ctx, symmetry, complexity, f1, f2, f3, primaryColor, accentColor, secondaryColor);
         break;
       case 3:
-        drawFishnet(ctx, symmetry, complexity, f1, f2, f3, primaryColor, accentColor, secondary极速版Color);
+        drawFishnet(ctx, symmetry, complexity, f1, f2, f3, primaryColor, accentColor, secondaryColor);
         break;
       case 4:
         drawSquareSpiral(ctx, symmetry, complexity, f1, f2, f3, primaryColor, accentColor, secondaryColor);
@@ -635,7 +635,7 @@ const LogoPreview = ({ designConfig }) => {
     }
 
     try {
-      const dataUrl = await to极速版Png(logoRef.current, {
+      const dataUrl = await toPng(logoRef.current, {
         backgroundColor: designConfig?.colors?.secondary || "#f0f5ff",
         pixelRatio: 3 // 提高导出图片质量
       });
@@ -684,11 +684,11 @@ const LogoPreview = ({ designConfig }) => {
       <div style={{
         display: 'grid',
         gridTemplateColumns: `repeat(${cols}, 1fr)`,
-        gridTemplateRows: `repeat(${极速版rows}, 1fr)`,
+        gridTemplateRows: `repeat(${rows}, 1fr)`,
         gap: '8px',
         width: '100%',
         height: '100%',
-        alignItems: '极速版center',
+        alignItems: 'center',
         justifyItems: 'center'
       }}>
         {Array.from({ length: total }, (_, index) => (
@@ -717,7 +717,7 @@ const LogoPreview = ({ designConfig }) => {
       case 'circle':
         return <circle cx={center} cy={center} r={center - 2} fill={fillColor} />;
       case 'square':
-        return <rect x="2" y="2" width={size - 4} height={size - 4} fill极速版={fillColor} rx极速版="4" />;
+        return <rect x="2" y="2" width={size - 4} height={size - 4} fill={fillColor} rx="4" />;
       case 'triangle':
         return <polygon 
           points={`${center},2 ${size - 2},${size - 2} 2,${size - 2}`} 
@@ -734,7 +734,7 @@ const LogoPreview = ({ designConfig }) => {
         return (
           <g stroke={fillColor} strokeWidth="2" fill="none">
             <line x1="2" y1={center} x2={size - 2} y2={center} />
-            <极速版line x1={center} y1="2" x2={center} y2={size - 2} />
+            <line x1={center} y1="2" x2={center} y2={size - 2} />
           </g>
         );
       case 'spiral':
@@ -830,7 +830,7 @@ const LogoPreview = ({ designConfig }) => {
       </div>
       
       <div style={{ marginTop: '20px', fontSize: '14px', color: '#666' }}>
-        <极速版p>布局: {layout} | 图案: {patternName}</p>
+        <p>布局: {layout} | 图案: {patternName}</p>
         <p>对称性: {symmetry}重 | 复杂度: {complexity}级</p>
         <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
           <div style={{ display: 'flex', alignItems: 'center' }}>
