@@ -58,30 +58,6 @@ const LogoPreview = ({ designConfig }) => {
     return <div>正在准备Logo预览...</div>;
   }
 
-  // 根据图案类型选择渲染函数
-  const renderPattern = () => {
-    switch(patternType) {
-      case 0:
-        return renderSpecialCross(symmetry, complexity, feature1, feature2, feature3, colors);
-      case 1:
-        return renderSierpinskiCarpet(symmetry, complexity, feature1, feature2, feature3, colors);
-      case 2:
-        return renderSquareResonator(symmetry, complexity, feature1, feature2, feature3, colors);
-      case 3:
-        return renderFishnet(symmetry, complexity, feature1, feature2, feature3, colors);
-      case 4:
-        return renderSquareSpiral(symmetry, complexity, feature1, feature2, feature3, colors);
-      case 5:
-        return renderNestedSquares(symmetry, complexity, feature1, feature2, feature3, colors);
-      case 6:
-        return renderDoubleCOpening(symmetry, complexity, feature1, feature2, feature3, colors);
-      case 7:
-        return renderGreekCross(symmetry, complexity, feature1, feature2, feature3, colors);
-      default:
-        return renderSpecialCross(symmetry, complexity, feature1, feature2, feature3, colors);
-    }
-  };
-
   // 特殊十字图案
   const renderSpecialCross = (symmetry, complexity, f1, f2, f3, colors) => {
     const centerX = 100;
@@ -143,7 +119,7 @@ const LogoPreview = ({ designConfig }) => {
     );
   };
 
-  // 其他图案渲染函数（简化版）
+  // 谢尔宾斯基地毯
   const renderSierpinskiCarpet = (symmetry, complexity, f1, f2, f3, colors) => {
     // 简化的谢尔宾斯基地毯实现
     const size = 100;
@@ -215,8 +191,209 @@ const LogoPreview = ({ designConfig }) => {
     );
   };
 
-  // 其他图案函数类似实现...
-  // 为节省空间，这里只实现了3种图案，您可以根据需要添加更多
+  // 鱼网状图案
+  const renderFishnet = (symmetry, complexity, f1, f2, f3, colors) => {
+    const size = 150;
+    const gridSize = 10 + complexity * 2;
+    const strokeWidth = 1 + complexity / 2;
+    
+    return (
+      <g>
+        {Array.from({ length: gridSize }).map((_, i) => (
+          <g key={i}>
+            <line 
+              x1={25 + (i * size / gridSize)} 
+              y1={25} 
+              x2={25 + (i * size / gridSize)} 
+              y2={25 + size} 
+              stroke={colors.primary} 
+              strokeWidth={strokeWidth} 
+            />
+            <line 
+              x1={25} 
+              y1={25 + (i * size / gridSize)} 
+              x2={25 + size} 
+              y2={25 + (i * size / gridSize)} 
+              stroke={colors.primary} 
+              strokeWidth={strokeWidth} 
+            />
+          </g>
+        ))}
+      </g>
+    );
+  };
+
+  // 方形螺旋
+  const renderSquareSpiral = (symmetry, complexity, f1, f2, f3, colors) => {
+    const centerX = 100;
+    const centerY = 100;
+    const maxSize = 80;
+    const turns = 3 + complexity;
+    const segments = 4 * turns;
+    const points = [];
+    
+    for (let i = 0; i <= segments; i++) {
+      const t = i / segments;
+      const size = maxSize * t;
+      const angle = (Math.PI / 2) * i;
+      
+      const x = centerX + size * Math.cos(angle);
+      const y = centerY + size * Math.sin(angle);
+      
+      points.push(`${x},${y}`);
+    }
+    
+    return (
+      <polyline 
+        points={points.join(' ')} 
+        fill="none" 
+        stroke={colors.primary} 
+        strokeWidth={3 + complexity / 2} 
+      />
+    );
+  };
+
+  // 嵌套方形
+  const renderNestedSquares = (symmetry, complexity, f1, f2, f3, colors) => {
+    const centerX = 100;
+    const centerY = 100;
+    const maxSize = 80;
+    const squaresCount = 3 + complexity;
+    
+    return (
+      <g>
+        {Array.from({ length: squaresCount }).map((_, i) => {
+          const size = maxSize - (i * maxSize / squaresCount);
+          return (
+            <rect 
+              key={i}
+              x={centerX - size/2} 
+              y={centerY - size/2} 
+              width={size} 
+              height={size} 
+              fill="none" 
+              stroke={colors.primary} 
+              strokeWidth={2 + i} 
+            />
+          );
+        })}
+      </g>
+    );
+  };
+
+  // 双C开口图案 - 修复版
+  const renderDoubleCOpening = (symmetry, complexity, f1, f2, f3, colors) => {
+    const centerX = 100;
+    const centerY = 100;
+    const radius = 40 + complexity * 5;
+    const thickness = 5 + complexity;
+    const openingAngle = 30 + f1 * 3; // 开口角度
+    
+    // 转换为弧度
+    const startAngle1 = (90 - openingAngle/2) * Math.PI / 180;
+    const endAngle1 = (90 + openingAngle/2) * Math.PI / 180;
+    const startAngle2 = (270 - openingAngle/2) * Math.PI / 180;
+    const endAngle2 = (270 + openingAngle/2) * Math.PI / 180;
+    
+    // 计算弧线路径的函数
+    const describeArc = (x, y, radius, startAngle, endAngle) => {
+      const startX = x + radius * Math.cos(startAngle);
+      const startY = y + radius * Math.sin(startAngle);
+      const endX = x + radius * Math.cos(endAngle);
+      const endY = y + radius * Math.sin(endAngle);
+      
+      const largeArcFlag = endAngle - startAngle <= Math.PI ? "0" : "1";
+      
+      return [
+        "M", startX, startY,
+        "A", radius, radius, 0, largeArcFlag, 1, endX, endY
+      ].join(" ");
+    };
+    
+    return (
+      <g>
+        {/* 上方的C形开口 */}
+        <path
+          d={describeArc(centerX, centerY, radius, startAngle1, endAngle1)}
+          fill="none"
+          stroke={colors.primary}
+          strokeWidth={thickness}
+        />
+        
+        {/* 下方的C形开口 */}
+        <path
+          d={describeArc(centerX, centerY, radius, startAngle2, endAngle2)}
+          fill="none"
+          stroke={colors.primary}
+          strokeWidth={thickness}
+        />
+        
+        {/* 中心点（可选） */}
+        {f3 > 5 && (
+          <circle cx={centerX} cy={centerY} r={3 + f3/2} fill={colors.accent} />
+        )}
+      </g>
+    );
+  };
+
+  // 希腊十字
+  const renderGreekCross = (symmetry, complexity, f1, f2, f3, colors) => {
+    const centerX = 100;
+    const centerY = 100;
+    const armLength = 30 + complexity * 5;
+    const armWidth = 8 + complexity;
+    
+    return (
+      <g>
+        {/* 垂直臂 */}
+        <rect 
+          x={centerX - armWidth/2} 
+          y={centerY - armLength} 
+          width={armWidth} 
+          height={armLength * 2} 
+          fill={colors.primary} 
+        />
+        
+        {/* 水平臂 */}
+        <rect 
+          x={centerX - armLength} 
+          y={centerY - armWidth/2} 
+          width={armLength * 2} 
+          height={armWidth} 
+          fill={colors.primary} 
+        />
+        
+        {/* 装饰（如果复杂度高） */}
+        {complexity > 3 && (
+          <circle cx={centerX} cy={centerY} r={armWidth/2 + 2} fill={colors.accent} />
+        )}
+      </g>
+    );
+  };
+
+  // 根据图案类型选择渲染函数
+  const renderPattern = () => {
+    switch(patternType) {
+      case 0:
+        return renderSpecialCross(symmetry, complexity, feature1, feature2, feature3, colors);
+      case 1:
+        return renderSierpinskiCarpet(symmetry, complexity, feature1, feature2, feature3, colors);
+      case 2:
+        return renderSquareResonator(symmetry, complexity, feature1, feature2, feature3, colors);
+      case 3:
+        return renderFishnet(symmetry, complexity, feature1, feature2, feature3, colors);
+      case 4:
+        return renderSquareSpiral(symmetry, complexity, feature1, feature2, feature3, colors);
+      case 5:
+        return renderNestedSquares(symmetry, complexity, feature1, feature2, feature3, colors);
+      case 6:
+        return renderDoubleCOpening(symmetry, complexity, feature1, feature2, feature3, colors);
+      case 7:
+        return renderGreekCross(symmetry, complexity, feature1, feature2, feature3, colors);
+      default:
+        return renderSpecialCross(symmetry, complexity, feature1, feature2, feature3, colors);
+    }
+  };
 
   // 解析布局字符串，如 "2x3"
   const parseLayout = () => {
