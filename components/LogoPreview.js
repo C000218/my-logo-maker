@@ -1,10 +1,11 @@
+
 'use client';
 
 import { useRef, useEffect, useState, useCallback } from 'react';
 import { Button, Space } from 'antd';
 import { DownloadOutlined } from '@ant-design/icons';
 import { toPng } from 'html-to-image';
-
+import Image from 'next/image'; // 引入Next.js的Image组件
 // 图案绘制函数 - 全部移到组件外部
 
 // 1. 特殊十字图案
@@ -554,6 +555,7 @@ const drawGreekCross = (ctx, symmetry, complexity, f1, f2, f3, primaryColor, sec
 };
 
 const LogoPreview = ({ designConfig }) => {
+  // 首先声明所有Hook - 这是修复的关键
   const logoRef = useRef(null);
   const canvasRef = useRef(null);
   const [isClient, setIsClient] = useState(false);
@@ -564,7 +566,7 @@ const LogoPreview = ({ designConfig }) => {
     setIsClient(true);
   }, []);
 
-  // 如果没有设计配置，显示加载状态
+  // 现在进行条件判断
   if (!designConfig) {
     return <div>正在准备Logo预览...</div>;
   }
@@ -774,7 +776,14 @@ const LogoPreview = ({ designConfig }) => {
         {/* 基元图案网格 */}
         <div style={{ width: '200px', height: '200px' }}>
           {patternImage ? (
-            <img src={patternImage} alt="Generated Pattern" style={{ width: '100%', height: '100%' }} />
+            // 使用Next.js的Image组件替代img标签
+            <Image 
+              src={patternImage} 
+              alt="Generated Pattern" 
+              width={200}
+              height={200}
+              style={{ objectFit: 'contain' }}
+            />
           ) : (
             <canvas
               ref={canvasRef}
