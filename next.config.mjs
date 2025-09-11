@@ -1,4 +1,3 @@
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // 允许开发环境下的跨源请求
@@ -21,4 +20,5 @@ const nextConfig = {
   },
 }
 
-module.exports = nextConfig
+// 使用ES模块的导出语法
+export default nextConfig;
