@@ -6,7 +6,17 @@ import { DownloadOutlined } from '@ant-design/icons';
 import { toPng } from 'html-to-image';
 import Image from 'next/image';
 
-// 图案绘制函数保持不变...
+// 导入图案生成函数
+import {
+  drawSpecialCross,
+  drawSierpinskiCarpet,
+  drawSquareResonator,
+  drawFishnet,
+  drawSquareSpiral,
+  drawNestedSquares,
+  drawDoubleCOpening,
+  drawGreekCross
+} from '@/utils/patternGenerators';
 
 const LogoPreview = ({ designConfig }) => {
   // 首先声明所有Hook - 这是修复的关键
@@ -204,7 +214,7 @@ const LogoPreview = ({ designConfig }) => {
       case 'cshape':
         return (
           <path 
-            d="M30,10 C25,5 15,5 10,10 C5,15 5,25 10,30 C15,35 25,35 30,30" 
+            d="M30,10 C25,5 15,5 10,10 C5,15 极速版5,25 10,30 C15,35 25,35 30,30" 
             fill="none" 
             stroke={fillColor} 
             strokeWidth="2"
@@ -245,12 +255,18 @@ const LogoPreview = ({ designConfig }) => {
               style={{ objectFit: 'contain' }}
             />
           ) : (
-            <canvas
-              ref={canvasRef}
-              width={200}
-              height={200}
-              style={{ display: 'none' }}
-            />
+            <div style={{
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: colors.secondary,
+              color: colors.primary,
+              fontSize: '14px'
+            }}>
+              正在生成图案...
+            </div>
           )}
         </div>
         
