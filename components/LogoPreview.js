@@ -523,7 +523,7 @@ const LogoPreview = ({ designConfig, initials }) => {
         style={{
           display: 'inline-block',
           backgroundColor: colors.secondary,
-          padding: '10px', // 最小化内边距
+          padding: '2px', // 最小化内边距
           borderRadius: '8px',
           marginBottom: '20px',
           width: '250px',
@@ -548,7 +548,7 @@ const LogoPreview = ({ designConfig, initials }) => {
         <div style={{ 
           marginTop: '5px',
           color: colors.accent,
-          fontSize: '15px',
+          fontSize: '20px',
           fontWeight: 'bold'
         }}>
           {footerText}
