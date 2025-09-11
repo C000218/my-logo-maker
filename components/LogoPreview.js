@@ -460,11 +460,11 @@ const LogoPreview = ({ designConfig, initials }) => {
     }
     // 如果 initials 是3个字母，使用2x2布局（最后一个位置留空）
     if (initials && initials.length === 3) {
-      return "2x2";
+      return "2x3";
     }
     // 如果 initials 是4个字母，使用2x2布局
     if (initials && initials.length === 4) {
-      return "2x2";
+      return "3x3";
     }
     // 否则使用配置的布局
     return layout;
@@ -538,7 +538,7 @@ const LogoPreview = ({ designConfig, initials }) => {
         {/* 基元图案网格 */}
         <div style={{ 
           width: '230px', // 最大化内部容器大小
-          height: '230px',
+          height: '200px',
           boxSizing: 'border-box'
         }}>
           {renderPatternGrid()}
@@ -548,7 +548,7 @@ const LogoPreview = ({ designConfig, initials }) => {
         <div style={{ 
           marginTop: '5px',
           color: colors.accent,
-          fontSize: '11px',
+          fontSize: '15px',
           fontWeight: 'bold'
         }}>
           {footerText}
