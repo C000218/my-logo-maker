@@ -6,7 +6,7 @@ import { DownloadOutlined } from '@ant-design/icons';
 import { toPng } from 'html-to-image';
 import { patternNames } from '@/lib/patternUtils';
 
-const LogoPreview = ({ designConfig }) => {
+const LogoPreview = ({ designConfig, initials }) => {
   const logoRef = useRef(null);
   const [isClient, setIsClient] = useState(false);
 
@@ -46,7 +46,7 @@ const LogoPreview = ({ designConfig }) => {
       });
 
       const link = document.createElement('a');
-      link.download = `bionic-logo.png`;
+      link.download = `bionic-logo-${initials || 'design'}.png`;
       link.href = dataUrl;
       link.click();
     } catch (err) {
@@ -281,57 +281,114 @@ const LogoPreview = ({ designConfig }) => {
     );
   };
 
-  // 双C开口图案 - 修复版
+  // 双C开口图案 - 根据Python代码修复
   const renderDoubleCOpening = (symmetry, complexity, f1, f2, f3, colors) => {
     const centerX = 100;
     const centerY = 100;
-    const radius = 40 + complexity * 5;
-    const thickness = 5 + complexity;
-    const openingAngle = 30 + f1 * 3; // 开口角度
+    const size = 40 + complexity * 5;
+    const halfSize = size / 2;
+    const gapSize = size / 2; // 开口长度为边长的一半
+    const lineWidth = 5 + complexity; // 线宽
     
-    // 转换为弧度
-    const startAngle1 = (90 - openingAngle/2) * Math.PI / 180;
-    const endAngle1 = (90 + openingAngle/2) * Math.PI / 180;
-    const startAngle2 = (270 - openingAngle/2) * Math.PI / 180;
-    const endAngle2 = (270 + openingAngle/2) * Math.PI / 180;
+    // 左侧C型（开口向左朝外）
+    const leftCenterX = centerX - halfSize;
     
-    // 计算弧线路径的函数
-    const describeArc = (x, y, radius, startAngle, endAngle) => {
-      const startX = x + radius * Math.cos(startAngle);
-      const startY = y + radius * Math.sin(startAngle);
-      const endX = x + radius * Math.cos(endAngle);
-      const endY = y + radius * Math.sin(endAngle);
-      
-      const largeArcFlag = endAngle - startAngle <= Math.PI ? "0" : "1";
-      
-      return [
-        "M", startX, startY,
-        "A", radius, radius, 0, largeArcFlag, 1, endX, endY
-      ].join(" ");
-    };
+    // 右侧C型（开口向右朝外）
+    const rightCenterX = centerX + halfSize;
     
     return (
       <g>
-        {/* 上方的C形开口 */}
-        <path
-          d={describeArc(centerX, centerY, radius, startAngle1, endAngle1)}
-          fill="none"
-          stroke={colors.primary}
-          strokeWidth={thickness}
+        {/* 左侧C型（开口向左朝外） */}
+        {/* 上横线（缩短一半，从中心到右侧） */}
+        <line 
+          x1={leftCenterX} 
+          y1={centerY + halfSize} 
+          x2={leftCenterX + halfSize} 
+          y2={centerY + halfSize} 
+          stroke={colors.primary} 
+          strokeWidth={lineWidth} 
+        />
+        {/* 下横线（缩短一半，从中心到右侧） */}
+        <line 
+          x1={leftCenterX} 
+          y1={centerY - halfSize} 
+          x2={leftCenterX + halfSize} 
+          y2={centerY - halfSize} 
+          stroke={colors.primary} 
+          strokeWidth={lineWidth} 
+        />
+        {/* 右侧竖线（完整） */}
+        <line 
+          x1={leftCenterX + halfSize} 
+          y1={centerY - halfSize} 
+          x2={leftCenterX + halfSize} 
+          y2={centerY + halfSize} 
+          stroke={colors.primary} 
+          strokeWidth={lineWidth} 
+        />
+        {/* 左侧开口线（与缩短线连接） */}
+        <line 
+          x1={leftCenterX} 
+          y1={centerY - halfSize} 
+          x2={leftCenterX} 
+          y2={centerY - gapSize/2} 
+          stroke={colors.primary} 
+          strokeWidth={lineWidth} 
+        />
+        <line 
+          x1={leftCenterX} 
+          y1={centerY + gapSize/2} 
+          x2={leftCenterX} 
+          y2={centerY + halfSize} 
+          stroke={colors.primary} 
+          strokeWidth={lineWidth} 
         />
         
-        {/* 下方的C形开口 */}
-        <path
-          d={describeArc(centerX, centerY, radius, startAngle2, endAngle2)}
-          fill="none"
-          stroke={colors.primary}
-          strokeWidth={thickness}
+        {/* 右侧C型（开口向右朝外） */}
+        {/* 上横线（缩短一半，从中心到左侧） */}
+        <line 
+          x1={rightCenterX} 
+          y1={centerY + halfSize} 
+          x2={rightCenterX - halfSize} 
+          y2={centerY + halfSize} 
+          stroke={colors.primary} 
+          strokeWidth={lineWidth} 
         />
-        
-        {/* 中心点（可选） */}
-        {f3 > 5 && (
-          <circle cx={centerX} cy={centerY} r={3 + f3/2} fill={colors.accent} />
-        )}
+        {/* 下横线（缩短一半，从中心到左侧） */}
+        <line 
+          x1={rightCenterX} 
+          y1={centerY - halfSize} 
+          x2={rightCenterX - halfSize} 
+          y2={centerY - halfSize} 
+          stroke={colors.primary} 
+          strokeWidth={lineWidth} 
+        />
+        {/* 左侧竖线（完整） */}
+        <line 
+          x1={rightCenterX - halfSize} 
+          y1={centerY - halfSize} 
+          x2={rightCenterX - halfSize} 
+          y2={centerY + halfSize} 
+          stroke={colors.primary} 
+          strokeWidth={lineWidth} 
+        />
+        {/* 右侧开口线（与缩短线连接） */}
+        <line 
+          x1={rightCenterX} 
+          y1={centerY - halfSize} 
+          x2={rightCenterX} 
+          y2={centerY - gapSize/2} 
+          stroke={colors.primary} 
+          strokeWidth={lineWidth} 
+        />
+        <line 
+          x1={rightCenterX} 
+          y1={centerY + gapSize/2} 
+          x2={rightCenterX} 
+          y2={centerY + halfSize} 
+          stroke={colors.primary} 
+          strokeWidth={lineWidth} 
+        />
       </g>
     );
   };
@@ -395,9 +452,20 @@ const LogoPreview = ({ designConfig }) => {
     }
   };
 
+  // 根据名字缩写长度确定布局
+  const getLayout = () => {
+    // 如果 initials 是2个字母，使用2x2布局
+    if (initials && initials.length === 2) {
+      return "2x2";
+    }
+    // 否则使用配置的布局
+    return layout;
+  };
+
   // 解析布局字符串，如 "2x3"
   const parseLayout = () => {
-    const [rows, cols] = layout.split('x').map(Number);
+    const effectiveLayout = getLayout();
+    const [rows, cols] = effectiveLayout.split('x').map(Number);
     return { rows: rows || 1, cols: cols || 1, total: (rows || 1) * (cols || 1) };
   };
 
@@ -411,7 +479,7 @@ const LogoPreview = ({ designConfig }) => {
         display: 'grid',
         gridTemplateColumns: `repeat(${cols}, 1fr)`,
         gridTemplateRows: `repeat(${rows}, 1fr)`,
-        gap: '8px',
+        gap: '4px', // 减少间隔从8px到4px
         width: '100%',
         height: '100%',
         alignItems: 'center',
@@ -441,7 +509,7 @@ const LogoPreview = ({ designConfig }) => {
         style={{
           display: 'inline-block',
           backgroundColor: colors.secondary,
-          padding: '30px',
+          padding: '20px', // 减少内边距
           borderRadius: '10px',
           marginBottom: '20px',
           width: '250px',
@@ -459,7 +527,7 @@ const LogoPreview = ({ designConfig }) => {
         
         {/* 底部文本 */}
         <div style={{ 
-          marginTop: '10px',
+          marginTop: '8px', // 减少上边距
           color: colors.accent,
           fontSize: '12px',
           fontWeight: 'bold'
@@ -483,7 +551,7 @@ const LogoPreview = ({ designConfig }) => {
       
       <div style={{ marginTop: '20px', fontSize: '14px', color: '#666' }}>
         <p>图案: {patternNames[patternType] || "特殊十字"} | 对称性: {symmetry}重 | 复杂度: {complexity}级</p>
-        <p>布局: {layout}</p>
+        <p>布局: {getLayout()}</p>
         <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <div style={{
