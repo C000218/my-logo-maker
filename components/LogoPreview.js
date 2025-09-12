@@ -191,20 +191,28 @@ const LogoPreview = ({ designConfig, initials }) => {
     );
   };
 
-   // 渔网图案 - 根据Python代码精确实现
+// 渔网图案 - 根据Python代码重新实现，支持基于复杂度的单元数量变化
 const renderFishnet = (symmetry, complexity, f1, f2, f3, colors) => {
   // 基础参数 - 与Python代码保持一致
   const baseUnitSize = 100; // 基础单元大小（对应Python中的300nm）
   const baseWireWidth = 16; // 基础线宽（对应Python中的50nm）
   
   // 根据复杂度调整单元数量
-  const unitCount = Math.max(2, 2 + Math.floor(complexity / 2)); // 复杂度增加，单元数量增加
+  // 复杂度0: 2x2单元 (基础)
+  // 复杂度1: 3x3单元
+  // 复杂度2: 4x4单元
+  // 以此类推...
+  const unitCount = 2 + complexity;
   
   // 计算总大小
   const totalSize = baseUnitSize * unitCount;
   
+  // 中心点坐标
+  const centerX = totalSize / 2;
+  const centerY = totalSize / 2;
+  
   return (
-    <g>
+    <g transform={`translate(${100 - centerX}, ${100 - centerY})`}>
       {/* 绘制每个单元的水平和垂直金属线 */}
       {Array.from({ length: unitCount }).map((_, row) => {
         return Array.from({ length: unitCount }).map((_, col) => {
@@ -256,8 +264,8 @@ const renderFishnet = (symmetry, complexity, f1, f2, f3, colors) => {
       {/* 根据对称性添加额外特征 */}
       {symmetry > 4 && (
         <circle
-          cx={totalSize / 2}
-          cy={totalSize / 2}
+          cx={centerX}
+          cy={centerY}
           r={baseUnitSize / 6}
           fill={colors.accent}
           stroke={colors.accent}
@@ -267,10 +275,10 @@ const renderFishnet = (symmetry, complexity, f1, f2, f3, colors) => {
       {/* 根据特征参数添加额外元素 */}
       {f1 > 5 && (
         <rect
-          x={totalSize / 4}
-          y={totalSize / 4}
-          width={totalSize / 2}
-          height={totalSize / 2}
+          x={centerX - baseUnitSize}
+          y={centerY - baseUnitSize}
+          width={baseUnitSize * 2}
+          height={baseUnitSize * 2}
           fill="none"
           stroke={colors.accent}
           strokeWidth={baseWireWidth / 2}
