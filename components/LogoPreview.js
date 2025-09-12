@@ -191,34 +191,76 @@ const LogoPreview = ({ designConfig, initials }) => {
     );
   };
 
-  // 鱼网状图案
-  const renderFishnet = (symmetry, complexity, f1, f2, f3, colors) => {
-    const size = 150;
-    const gridSize = 10 + complexity * 2;
-    const strokeWidth = 1 + complexity / 2;
-    
-    return (
-      <g>
-        {Array.from({ length: gridSize }).map((_, i) => (
-          <g key={i}>
-            <line 
-              x1={25 + (i * size / gridSize)} 
-              y1={25} 
-              x2={25 + (i * size / gridSize)} 
-              y2={25 + size} 
-              stroke={colors.primary} 
-              strokeWidth={strokeWidth} 
+   // 渔网图案 - 根据Python代码修复
+    const renderFishnet = (symmetry, complexity, f1, f2, f3, colors) => {
+     // 基础单元大小和线宽
+     const baseUnitSize = 100; // 基础单元大小（像素）
+     const baseWireWidth = 15; // 基础线宽（像素）
+  
+     // 根据复杂度调整单元数量和线宽
+     const unitCount = 2 + complexity; // 复杂度增加，单元数量增加
+     const wireWidth = baseWireWidth * (1 - complexity * 0.1); // 复杂度增加，线宽略微减小
+  
+    // 计算总大小
+    const totalSize = baseUnitSize * unitCount;
+  
+      return (
+        <g>
+        {/* 绘制水平金属线 */}
+        {Array.from({ length: unitCount + 1 }).map((_, i) => {
+          const yPos = i * baseUnitSize;
+          return (
+            <rect
+              key={`hori-${i}`}
+              x={0}
+              y={yPos}
+              width={totalSize}
+              height={wireWidth}
+              fill={colors.primary}
+              stroke={colors.primary}
             />
-            <line 
-              x1={25} 
-              y1={25 + (i * size / gridSize)} 
-              x2={25 + size} 
-              y2={25 + (i * size / gridSize)} 
-              stroke={colors.primary} 
-              strokeWidth={strokeWidth} 
-            />
-          </g>
-        ))}
+          );
+        })}
+      
+        {/* 绘制垂直金属线 */}
+        {Array.from({ length: unitCount + 1 }).map((_, i) => {
+          const xPos = i * baseUnitSize;
+            return (
+            <rect
+              key={`vert-${i}`}
+              x={xPos}
+              y={0}
+              width={wireWidth}
+              height={totalSize}
+              fill={colors.primary}
+              stroke={colors.primary}
+           />
+          );
+        })}
+      
+        {/* 根据对称性添加额外特征 */}
+        {symmetry > 4 && (
+          <circle
+            cx={totalSize / 2}
+            cy={totalSize / 2}
+            r={baseUnitSize / 4}
+            fill={colors.accent}
+            stroke={colors.accent}
+          />
+        )}
+      
+        {/* 根据特征参数添加额外元素 */}
+        {f1 > 5 && (
+          <rect
+            x={totalSize / 4}
+            y={totalSize / 4}
+            width={totalSize / 2}
+            height={totalSize / 2}
+            fill="none"
+            stroke={colors.accent}
+            strokeWidth={wireWidth / 2}
+          />
+        )}
       </g>
     );
   };
