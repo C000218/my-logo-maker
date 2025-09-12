@@ -191,79 +191,94 @@ const LogoPreview = ({ designConfig, initials }) => {
     );
   };
 
-   // 渔网图案 - 根据Python代码修复
-    const renderFishnet = (symmetry, complexity, f1, f2, f3, colors) => {
-     // 基础单元大小和线宽
-     const baseUnitSize = 100; // 基础单元大小（像素）
-     const baseWireWidth = 15; // 基础线宽（像素）
+   // 渔网图案 - 根据Python代码精确实现
+const renderFishnet = (symmetry, complexity, f1, f2, f3, colors) => {
+  // 基础参数 - 与Python代码保持一致
+  const baseUnitSize = 100; // 基础单元大小（对应Python中的300nm）
+  const baseWireWidth = 16; // 基础线宽（对应Python中的50nm）
   
-     // 根据复杂度调整单元数量和线宽
-     const unitCount = 2 + complexity; // 复杂度增加，单元数量增加
-     const wireWidth = baseWireWidth * (1 - complexity * 0.1); // 复杂度增加，线宽略微减小
+  // 根据复杂度调整单元数量
+  const unitCount = Math.max(2, 2 + Math.floor(complexity / 2)); // 复杂度增加，单元数量增加
   
-    // 计算总大小
-    const totalSize = baseUnitSize * unitCount;
+  // 计算总大小
+  const totalSize = baseUnitSize * unitCount;
   
-      return (
-        <g>
-        {/* 绘制水平金属线 */}
-        {Array.from({ length: unitCount + 1 }).map((_, i) => {
-          const yPos = i * baseUnitSize;
+  return (
+    <g>
+      {/* 绘制每个单元的水平和垂直金属线 */}
+      {Array.from({ length: unitCount }).map((_, row) => {
+        return Array.from({ length: unitCount }).map((_, col) => {
+          const xOffset = col * baseUnitSize;
+          const yOffset = row * baseUnitSize;
+          
           return (
-            <rect
-              key={`hori-${i}`}
-              x={0}
-              y={yPos}
-              width={totalSize}
-              height={wireWidth}
-              fill={colors.primary}
-              stroke={colors.primary}
-            />
+            <g key={`unit-${row}-${col}`}>
+              {/* 绘制水平金属线（在Y方向上下两侧） */}
+              <rect
+                x={xOffset}
+                y={yOffset}
+                width={baseUnitSize}
+                height={baseWireWidth}
+                fill={colors.primary}
+                stroke={colors.primary}
+              />
+              <rect
+                x={xOffset}
+                y={yOffset + baseUnitSize - baseWireWidth}
+                width={baseUnitSize}
+                height={baseWireWidth}
+                fill={colors.primary}
+                stroke={colors.primary}
+              />
+              
+              {/* 绘制垂直金属线（在X方向左右两侧） */}
+              <rect
+                x={xOffset}
+                y={yOffset}
+                width={baseWireWidth}
+                height={baseUnitSize}
+                fill={colors.primary}
+                stroke={colors.primary}
+              />
+              <rect
+                x={xOffset + baseUnitSize - baseWireWidth}
+                y={yOffset}
+                width={baseWireWidth}
+                height={baseUnitSize}
+                fill={colors.primary}
+                stroke={colors.primary}
+              />
+            </g>
           );
-        })}
+        });
+      })}
       
-        {/* 绘制垂直金属线 */}
-        {Array.from({ length: unitCount + 1 }).map((_, i) => {
-          const xPos = i * baseUnitSize;
-            return (
-            <rect
-              key={`vert-${i}`}
-              x={xPos}
-              y={0}
-              width={wireWidth}
-              height={totalSize}
-              fill={colors.primary}
-              stroke={colors.primary}
-           />
-          );
-        })}
+      {/* 根据对称性添加额外特征 */}
+      {symmetry > 4 && (
+        <circle
+          cx={totalSize / 2}
+          cy={totalSize / 2}
+          r={baseUnitSize / 6}
+          fill={colors.accent}
+          stroke={colors.accent}
+        />
+      )}
       
-        {/* 根据对称性添加额外特征 */}
-        {symmetry > 4 && (
-          <circle
-            cx={totalSize / 2}
-            cy={totalSize / 2}
-            r={baseUnitSize / 4}
-            fill={colors.accent}
-            stroke={colors.accent}
-          />
-        )}
-      
-        {/* 根据特征参数添加额外元素 */}
-        {f1 > 5 && (
-          <rect
-            x={totalSize / 4}
-            y={totalSize / 4}
-            width={totalSize / 2}
-            height={totalSize / 2}
-            fill="none"
-            stroke={colors.accent}
-            strokeWidth={wireWidth / 2}
-          />
-        )}
-      </g>
-    );
-  };
+      {/* 根据特征参数添加额外元素 */}
+      {f1 > 5 && (
+        <rect
+          x={totalSize / 4}
+          y={totalSize / 4}
+          width={totalSize / 2}
+          height={totalSize / 2}
+          fill="none"
+          stroke={colors.accent}
+          strokeWidth={baseWireWidth / 2}
+        />
+      )}
+    </g>
+  );
+};
 
   // 方形螺旋
   const renderSquareSpiral = (symmetry, complexity, f1, f2, f3, colors) => {
