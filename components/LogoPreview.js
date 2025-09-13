@@ -657,32 +657,65 @@ const LogoPreview = ({ designConfig, initials }) => {
   };
 
   // 圆形谐振环
-  const renderCircularResonator = (complexity, f1, f2, f3, colors) => {
-    const outerRadius = 50 + complexity * 4;
-    const innerRadius = 35 + complexity * 3;
-    const thickness = 10 + complexity;
-    
-    return (
-      <g>
-        {/* 外环 */}
-        <circle cx={100} cy={100} r={outerRadius} 
-                fill="none" stroke={colors.primary} strokeWidth={thickness} />
-        
-        {/* 内环 */}
-        <circle cx={100} cy={100} r={innerRadius} 
-                fill="none" stroke={colors.primary} strokeWidth={thickness/2} />
-        
-        {/* 缺口 */}
-        <line x1={100 + outerRadius - 10} y1={100 - 8} 
-              x2={100 + outerRadius - 10} y2={100 + 8} 
-              stroke={colors.secondary} strokeWidth={thickness + 2} />
-        
-        <line x1={100 - outerRadius + 10} y1={100 - 8} 
-              x2={100 - outerRadius + 10} y2={100 + 8} 
-              stroke={colors.secondary} strokeWidth={thickness + 2} />
-      </g>
-    );
+const renderCircularResonator = (complexity, f1, f2, f3, colors) => {
+  const outerRadius = 50 + complexity * 4;
+  const innerRadius = 35 + complexity * 3;
+  const thickness = 10 + complexity;
+  const gapSize = 15; // 缺口大小
+  
+  // 计算大圆缺口的位置（顶部，角度0度）
+  const outerGapStartAngle = -gapSize/2; // -7.5度
+  const outerGapEndAngle = gapSize/2; // 7.5度
+  
+  // 计算小圆缺口的位置（底部，角度180度）
+  const innerGapStartAngle = 180 - gapSize/2; // 172.5度
+  const innerGapEndAngle = 180 + gapSize/2; // 187.5度
+  
+  // 将角度转换为弧度
+  const toRadians = (angle) => angle * Math.PI / 180;
+  
+  // 计算圆弧上的点坐标
+  const pointOnCircle = (cx, cy, radius, angle) => {
+    const rad = toRadians(angle);
+    return {
+      x: cx + radius * Math.cos(rad),
+      y: cy + radius * Math.sin(rad)
+    };
   };
+  
+  // 生成带缺口的圆形路径
+  const createGappedCirclePath = (cx, cy, radius, gapStartAngle, gapEndAngle) => {
+    // 计算缺口开始和结束点的坐标
+    const gapStart = pointOnCircle(cx, cy, radius, gapStartAngle);
+    const gapEnd = pointOnCircle(cx, cy, radius, gapEndAngle);
+    
+    // 创建路径
+    return `
+      M ${gapEnd.x} ${gapEnd.y}
+      A ${radius} ${radius} 0 1 1 ${gapStart.x} ${gapStart.y}
+    `;
+  };
+  
+  return (
+    <g>
+      {/* 外环 - 顶部有缺口 */}
+      <path
+        d={createGappedCirclePath(100, 100, outerRadius, outerGapStartAngle, outerGapEndAngle)}
+        fill="none"
+        stroke={colors.primary}
+        strokeWidth={thickness}
+      />
+      
+      {/* 内环 - 底部有缺口 */}
+      <path
+        d={createGappedCirclePath(100, 100, innerRadius, innerGapStartAngle, innerGapEndAngle)}
+        fill="none"
+        stroke={colors.primary}
+        strokeWidth={thickness/2}
+      />
+    </g>
+  );
+};
 
   // 双C开口图案
   const renderDoubleCOpening = (complexity, f1, f2, f3, colors) => {
