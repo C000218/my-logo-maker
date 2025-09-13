@@ -168,7 +168,7 @@ const LogoPreview = ({ designConfig, initials }) => {
     );
   };
 
-  // 方形谐振环
+// 方形谐振环
 const renderSquareResonator = (complexity, f1, f2, f3, colors) => {
   const outerSize = 70 + complexity * 6;
   const innerSize = 50 + complexity * 4;
@@ -183,12 +183,13 @@ const renderSquareResonator = (complexity, f1, f2, f3, colors) => {
   
   return (
     <g>
-      {/* 外框 - 右侧有缺口 */}
+      {/* 外框 - 右侧中间有缺口 */}
       <path
         d={`
           M ${outerX} ${outerY}
-          L ${outerX + outerSize - gapSize} ${outerY}
-          M ${outerX + outerSize} ${outerY}
+          L ${outerX + outerSize - gapSize/2} ${outerY}
+          M ${outerX + outerSize + gapSize/2} ${outerY}
+          L ${outerX + outerSize} ${outerY}
           L ${outerX + outerSize} ${outerY + outerSize}
           L ${outerX} ${outerY + outerSize}
           L ${outerX} ${outerY}
@@ -198,14 +199,15 @@ const renderSquareResonator = (complexity, f1, f2, f3, colors) => {
         strokeWidth={thickness}
       />
       
-      {/* 内框 - 左侧有缺口 */}
+      {/* 内框 - 左侧中间有缺口 */}
       <path
         d={`
           M ${innerX + innerSize} ${innerY}
           L ${innerX + innerSize} ${innerY + innerSize}
           L ${innerX} ${innerY + innerSize}
-          L ${innerX} ${innerY + gapSize}
-          M ${innerX} ${innerY}
+          L ${innerX} ${innerY + gapSize/2}
+          M ${innerX} ${innerY - gapSize/2}
+          L ${innerX} ${innerY}
           L ${innerX + innerSize} ${innerY}
         `}
         fill="none"
@@ -1100,7 +1102,7 @@ const renderCircularResonator = (complexity, f1, f2, f3, colors) => {
           borderRadius: '8px',
           marginBottom: '20px',
           width: '350px',
-          height: '350px',
+          height: '370px',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
@@ -1110,8 +1112,8 @@ const renderCircularResonator = (complexity, f1, f2, f3, colors) => {
       >
         {/* 基元图案网格 */}
         <div style={{ 
-          width: '320px',
-          height: '280px',
+          width: '300px',
+          height: '260px',
           boxSizing: 'border-box'
         }}>
           {renderPatternGrid()}
