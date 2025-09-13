@@ -1101,8 +1101,8 @@ const renderCircularResonator = (complexity, f1, f2, f3, colors) => {
           padding: '2px',
           borderRadius: '8px',
           marginBottom: '20px',
-          width: '350px',
-          height: '370px',
+          width: '400px',
+          height: '420px',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
@@ -1112,8 +1112,8 @@ const renderCircularResonator = (complexity, f1, f2, f3, colors) => {
       >
         {/* 基元图案网格 */}
         <div style={{ 
-          width: '300px',
-          height: '260px',
+          width: '350px',
+          height: '330px',
           boxSizing: 'border-box'
         }}>
           {renderPatternGrid()}
