@@ -174,7 +174,7 @@ export default function LogoGenerator() {
                 flexDirection: 'column'
               }}>
                 <div style={{ fontSize: '48px', marginBottom: '16px' }}>🎨</div>
-                <p>填写左侧表单并点击"生成"按钮</p>
+                <p>填写左侧表单并点击&quot;生成&quot;按钮</p>
                 <p>即可查看您的个性化Logo</p>
               </div>
             )}

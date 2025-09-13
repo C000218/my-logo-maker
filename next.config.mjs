@@ -12,11 +12,7 @@ const nextConfig = {
   
   // 可选：如果您使用的是 Next.js 15+，可能需要添加以下配置
   experimental: {
-    allowedDevOrigins: [
-      '192.168.36.1',
-      'localhost',
-      '127.0.0.1',
-    ],
+
   },
 }
 
