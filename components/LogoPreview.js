@@ -29,7 +29,6 @@ const LogoPreview = ({ designConfig, initials }) => {
     feature2 = 0,
     feature3 = 0,
     rotation = 0,
-    scale = 0.8,
     colors = { primary: "#1890ff", secondary: "#f0f5ff", accent: "#096dd9" },
     footerText = "Bionic Metamaterials"
   } = designConfig;
@@ -63,7 +62,7 @@ const LogoPreview = ({ designConfig, initials }) => {
   const renderSquareSpiral = (complexity, f1, f2, f3, colors) => {
     const centerX = 100;
     const centerY = 100;
-    const maxSize = 60 + complexity * 5;
+    const maxSize = 80 + complexity * 10;
     const turns = 3 + Math.floor(complexity / 2);
     const segments = 4 * turns;
     const points = [];
@@ -84,7 +83,7 @@ const LogoPreview = ({ designConfig, initials }) => {
         points={points.join(' ')} 
         fill="none" 
         stroke={colors.primary} 
-        strokeWidth={3 + complexity / 2} 
+        strokeWidth={4 + complexity} 
       />
     );
   };
@@ -93,14 +92,14 @@ const LogoPreview = ({ designConfig, initials }) => {
   const renderChiralAuxetic = (complexity, f1, f2, f3, colors) => {
     const centerX = 100;
     const centerY = 100;
-    const radius = 30 + complexity * 5;
+    const radius = 40 + complexity * 8;
     const nArms = 4 + Math.floor(f1 / 3);
     const chirality = f2 > 5 ? 'right' : 'left';
     
     return (
       <g>
         {/* 中心圆 */}
-        <circle cx={centerX} cy={centerY} r={radius/3} fill={colors.accent} />
+        <circle cx={centerX} cy={centerY} r={radius/2} fill={colors.accent} />
         
         {/* 绘制每个臂/韧带 */}
         {Array.from({ length: nArms }).map((_, i) => {
@@ -108,16 +107,16 @@ const LogoPreview = ({ designConfig, initials }) => {
           const chiralitySign = chirality === 'right' ? 1 : -1;
           
           // 计算臂的起点（在中心圆上）
-          const startX = centerX + (radius/3) * Math.cos(angle);
-          const startY = centerY + (radius/3) * Math.sin(angle);
+          const startX = centerX + (radius/2) * Math.cos(angle);
+          const startY = centerY + (radius/2) * Math.sin(angle);
           
           // 计算臂的终点（在外圆上）
-          const endRadius = radius * 1.5;
+          const endRadius = radius * 1.8;
           const endX = centerX + endRadius * Math.cos(angle);
           const endY = centerY + endRadius * Math.sin(angle);
           
           // 计算控制点（使臂弯曲）
-          const controlRadius = (radius/3 + endRadius) / 2;
+          const controlRadius = (radius/2 + endRadius) / 2;
           const controlAngle = angle + chiralitySign * (2 * Math.PI / nArms) / 3;
           const controlX = centerX + controlRadius * Math.cos(controlAngle);
           const controlY = centerY + controlRadius * Math.sin(controlAngle);
@@ -129,7 +128,7 @@ const LogoPreview = ({ designConfig, initials }) => {
               d={`M ${startX},${startY} Q ${controlX},${controlY} ${endX},${endY}`}
               fill="none"
               stroke={colors.primary}
-              strokeWidth={4 + complexity}
+              strokeWidth={6 + complexity}
             />
           );
         })}
@@ -142,8 +141,8 @@ const LogoPreview = ({ designConfig, initials }) => {
     const centerX = 100;
     const centerY = 100;
     const nSquares = 3 + Math.floor(complexity / 2);
-    const baseSize = 30;
-    const gap = 10 + f1;
+    const baseSize = 40;
+    const gap = 12 + f1;
     
     return (
       <g>
@@ -158,22 +157,22 @@ const LogoPreview = ({ designConfig, initials }) => {
               height={size} 
               fill="none" 
               stroke={colors.primary} 
-              strokeWidth={3 + i} 
+              strokeWidth={4 + i} 
             />
           );
         })}
         
         {/* 中心点 */}
-        <circle cx={centerX} cy={centerY} r={5 + complexity} fill={colors.accent} />
+        <circle cx={centerX} cy={centerY} r={8 + complexity} fill={colors.accent} />
       </g>
     );
   };
 
   // 方形谐振环
   const renderSquareResonator = (complexity, f1, f2, f3, colors) => {
-    const outerSize = 60 + complexity * 5;
-    const innerSize = 40 + complexity * 3;
-    const thickness = 8 + complexity * 2;
+    const outerSize = 70 + complexity * 6;
+    const innerSize = 50 + complexity * 4;
+    const thickness = 10 + complexity * 2;
     
     return (
       <g>
@@ -188,12 +187,12 @@ const LogoPreview = ({ designConfig, initials }) => {
               fill="none" stroke={colors.primary} strokeWidth={thickness/2} />
         
         {/* 缺口 */}
-        <line x1={100 + outerSize/2 - 10} y1={100 - 5} 
-              x2={100 + outerSize/2 - 10} y2={100 + 5} 
+        <line x1={100 + outerSize/2 - 12} y1={100 - 8} 
+              x2={100 + outerSize/2 - 12} y2={100 + 8} 
               stroke={colors.secondary} strokeWidth={thickness + 2} />
         
-        <line x1={100 - outerSize/2 + 10} y1={100 - 5} 
-              x2={100 - outerSize/2 + 10} y2={100 + 5} 
+        <line x1={100 - outerSize/2 + 12} y1={100 - 8} 
+              x2={100 - outerSize/2 + 12} y2={100 + 8} 
               stroke={colors.secondary} strokeWidth={thickness + 2} />
       </g>
     );
@@ -202,8 +201,8 @@ const LogoPreview = ({ designConfig, initials }) => {
   // 狄拉克锥结构
   const renderDiracCone = (complexity, f1, f2, f3, colors) => {
     const n = 3 + Math.floor(complexity / 2);
-    const a = 80 / n;
-    const dotSize = 3 + complexity;
+    const a = 100 / n;
+    const dotSize = 5 + complexity;
     
     return (
       <g>
@@ -231,7 +230,7 @@ const LogoPreview = ({ designConfig, initials }) => {
                   x1={xA} y1={yA} 
                   x2={xB} y2={yB} 
                   stroke={colors.primary} 
-                  strokeWidth={1 + complexity/2} 
+                  strokeWidth={2 + complexity/2} 
                 />
               </g>
             );
@@ -245,11 +244,11 @@ const LogoPreview = ({ designConfig, initials }) => {
   const renderJerusalemCross = (complexity, f1, f2, f3, colors) => {
     const centerX = 100;
     const centerY = 100;
-    const mainArmLength = 30 + complexity * 5;
-    const mainArmWidth = 8 + complexity;
-    const crossArmLength = 20 + complexity * 3;
-    const crossArmWidth = 6 + complexity;
-    const gap = 5 + f1;
+    const mainArmLength = 40 + complexity * 6;
+    const mainArmWidth = 12 + complexity;
+    const crossArmLength = 25 + complexity * 4;
+    const crossArmWidth = 8 + complexity;
+    const gap = 8 + f1;
     
     return (
       <g>
@@ -293,8 +292,8 @@ const LogoPreview = ({ designConfig, initials }) => {
 
   // 渔网图案
   const renderFishnet = (complexity, f1, f2, f3, colors) => {
-    const baseUnitSize = 100;
-    const baseWireWidth = 16;
+    const baseUnitSize = 120;
+    const baseWireWidth = 20;
     const unitCount = 2 + complexity;
     const totalSize = baseUnitSize * unitCount;
     const centerX = totalSize / 2;
@@ -355,7 +354,7 @@ const LogoPreview = ({ designConfig, initials }) => {
           <circle
             cx={centerX}
             cy={centerY}
-            r={baseUnitSize / 6}
+            r={baseUnitSize / 5}
             fill={colors.accent}
             stroke={colors.accent}
           />
@@ -382,7 +381,7 @@ const LogoPreview = ({ designConfig, initials }) => {
     const centerX = 100;
     const centerY = 100;
     const maxDepth = Math.min(complexity, 4);
-    const initialSize = 60;
+    const initialSize = 70;
     
     // 递归绘制分形
     const drawFractal = (x, y, size, depth) => {
@@ -400,7 +399,7 @@ const LogoPreview = ({ designConfig, initials }) => {
           height={size} 
           fill={colors.primary} 
           stroke={colors.accent} 
-          strokeWidth={1}
+          strokeWidth={2}
           opacity={0.8 - depth * 0.2}
         />
       );
@@ -428,7 +427,7 @@ const LogoPreview = ({ designConfig, initials }) => {
 
   // 谢尔宾斯基地毯
   const renderSierpinskiCarpet = (complexity, f1, f2, f3, colors) => {
-    const size = 100;
+    const size = 120;
     const level = Math.min(complexity, 3);
     
     const drawSierpinski = (x, y, size, level) => {
@@ -468,8 +467,8 @@ const LogoPreview = ({ designConfig, initials }) => {
     
     return (
       <g>
-        <rect x="50" y="50" width={size} height={size} fill={colors.primary} />
-        {drawSierpinski(50, 50, size, level)}
+        <rect x="40" y="40" width={size} height={size} fill={colors.primary} />
+        {drawSierpinski(40, 40, size, level)}
       </g>
     );
   };
@@ -478,10 +477,10 @@ const LogoPreview = ({ designConfig, initials }) => {
   const renderJerusalemCrossVariant = (complexity, f1, f2, f3, colors) => {
     const centerX = 100;
     const centerY = 100;
-    const centerSize = 30 + complexity * 3;
-    const armLength = 50 + complexity * 5;
-    const armWidth = 10 + complexity;
-    const gap = 5 + f1;
+    const centerSize = 40 + complexity * 4;
+    const armLength = 60 + complexity * 6;
+    const armWidth = 12 + complexity;
+    const gap = 8 + f1;
     
     return (
       <g>
@@ -493,7 +492,7 @@ const LogoPreview = ({ designConfig, initials }) => {
           height={centerSize} 
           fill={colors.primary} 
           stroke={colors.accent} 
-          strokeWidth={2}
+          strokeWidth={3}
         />
         
         {/* 四个方向的十字臂 */}
@@ -511,7 +510,7 @@ const LogoPreview = ({ designConfig, initials }) => {
             height={rect.height} 
             fill={colors.primary} 
             stroke={colors.accent} 
-            strokeWidth={2}
+            strokeWidth={3}
           />
         ))}
       </g>
@@ -522,8 +521,8 @@ const LogoPreview = ({ designConfig, initials }) => {
   const renderGreekCross = (complexity, f1, f2, f3, colors) => {
     const centerX = 100;
     const centerY = 100;
-    const armLength = 30 + complexity * 5;
-    const armWidth = 8 + complexity;
+    const armLength = 40 + complexity * 6;
+    const armWidth = 12 + complexity;
     
     return (
       <g>
@@ -547,7 +546,7 @@ const LogoPreview = ({ designConfig, initials }) => {
         
         {/* 装饰（如果复杂度高） */}
         {complexity > 3 && (
-          <circle cx={centerX} cy={centerY} r={armWidth/2 + 2} fill={colors.accent} />
+          <circle cx={centerX} cy={centerY} r={armWidth/2 + 4} fill={colors.accent} />
         )}
       </g>
     );
@@ -556,7 +555,7 @@ const LogoPreview = ({ designConfig, initials }) => {
   // 方形梯度
   const renderSquareGradient = (complexity, f1, f2, f3, colors) => {
     const n = 5;
-    const period = 20;
+    const period = 25;
     const centerIdx = (n - 1) / 2;
     const maxDist = 2 * centerIdx;
     
@@ -572,7 +571,7 @@ const LogoPreview = ({ designConfig, initials }) => {
             const distFromCenter = Math.abs(i - centerIdx) + Math.abs(j - centerIdx);
             
             // 计算尺寸（从中心向外渐变）
-            const size = 15 - 10 * (distFromCenter / maxDist);
+            const size = 18 - 12 * (distFromCenter / maxDist);
             
             // 计算不透明度
             const opacity = 0.8 - 0.6 * (distFromCenter / maxDist);
@@ -587,7 +586,7 @@ const LogoPreview = ({ designConfig, initials }) => {
                 fill={colors.primary}
                 opacity={opacity}
                 stroke={colors.accent}
-                strokeWidth={1}
+                strokeWidth={2}
               />
             );
           });
@@ -600,12 +599,12 @@ const LogoPreview = ({ designConfig, initials }) => {
   const renderSpecialCross = (complexity, f1, f2, f3, colors) => {
     const centerX = 100;
     const centerY = 100;
-    const branchLength = 40 + 5 * complexity;
-    const branchWidth = 4 + complexity;
+    const branchLength = 50 + 6 * complexity;
+    const branchWidth = 6 + complexity;
     const secondaryRatio = 0.4 + 0.2 * f2 / 10;
     const secondaryLength = branchLength * secondaryRatio;
     const secondaryWidth = branchWidth * 0.7;
-    const centerSize = 5 + f3;
+    const centerSize = 8 + f3;
     
     return (
       <g>
@@ -659,9 +658,9 @@ const LogoPreview = ({ designConfig, initials }) => {
 
   // 圆形谐振环
   const renderCircularResonator = (complexity, f1, f2, f3, colors) => {
-    const outerRadius = 40 + complexity * 3;
-    const innerRadius = 25 + complexity * 2;
-    const thickness = 8 + complexity;
+    const outerRadius = 50 + complexity * 4;
+    const innerRadius = 35 + complexity * 3;
+    const thickness = 10 + complexity;
     
     return (
       <g>
@@ -674,12 +673,12 @@ const LogoPreview = ({ designConfig, initials }) => {
                 fill="none" stroke={colors.primary} strokeWidth={thickness/2} />
         
         {/* 缺口 */}
-        <line x1={100 + outerRadius - 8} y1={100 - 5} 
-              x2={100 + outerRadius - 8} y2={100 + 5} 
+        <line x1={100 + outerRadius - 10} y1={100 - 8} 
+              x2={100 + outerRadius - 10} y2={100 + 8} 
               stroke={colors.secondary} strokeWidth={thickness + 2} />
         
-        <line x1={100 - outerRadius + 8} y1={100 - 5} 
-              x2={100 - outerRadius + 8} y2={100 + 5} 
+        <line x1={100 - outerRadius + 10} y1={100 - 8} 
+              x2={100 - outerRadius + 10} y2={100 + 8} 
               stroke={colors.secondary} strokeWidth={thickness + 2} />
       </g>
     );
@@ -689,10 +688,10 @@ const LogoPreview = ({ designConfig, initials }) => {
   const renderDoubleCOpening = (complexity, f1, f2, f3, colors) => {
     const centerX = 100;
     const centerY = 100;
-    const size = 40 + complexity * 5;
+    const size = 50 + complexity * 6;
     const halfSize = size / 2;
     const gapSize = size / 2;
-    const lineWidth = 5 + complexity;
+    const lineWidth = 8 + complexity;
     
     // 左侧C型（开口向左朝外）
     const leftCenterX = centerX - halfSize;
@@ -802,8 +801,8 @@ const LogoPreview = ({ designConfig, initials }) => {
     const centerX = 100;
     const centerY = 100;
     const numTriangles = 3 + Math.floor(complexity / 2);
-    const size = 30 + complexity * 3;
-    const gap = 10 + f2;
+    const size = 40 + complexity * 4;
+    const gap = 15 + f2;
     
     return (
       <g>
@@ -827,7 +826,7 @@ const LogoPreview = ({ designConfig, initials }) => {
               points={`${x1},${y1} ${x2},${y2} ${x3},${y3}`}
               fill={colors.primary}
               stroke={colors.accent}
-              strokeWidth={2}
+              strokeWidth={3}
               opacity={0.7 + i * 0.1}
             />
           );
@@ -839,8 +838,8 @@ const LogoPreview = ({ designConfig, initials }) => {
   // 光子晶体结构
   const renderPhotonicCrystal = (complexity, f1, f2, f3, colors) => {
     const n = 3 + Math.floor(complexity / 2);
-    const a = 80 / n;
-    const rodRadius = 5 + complexity;
+    const a = 100 / n;
+    const rodRadius = 8 + complexity;
     
     return (
       <g>
@@ -858,7 +857,7 @@ const LogoPreview = ({ designConfig, initials }) => {
                 r={rodRadius}
                 fill={colors.primary}
                 stroke={colors.accent}
-                strokeWidth={2}
+                strokeWidth={3}
               />
             );
           });
@@ -871,7 +870,7 @@ const LogoPreview = ({ designConfig, initials }) => {
   const renderNestedSquares = (complexity, f1, f2, f3, colors) => {
     const centerX = 100;
     const centerY = 100;
-    const maxSize = 80;
+    const maxSize = 90;
     const squaresCount = 3 + complexity;
     
     return (
@@ -887,7 +886,7 @@ const LogoPreview = ({ designConfig, initials }) => {
               height={size} 
               fill="none" 
               stroke={colors.primary} 
-              strokeWidth={2 + i} 
+              strokeWidth={3 + i} 
             />
           );
         })}
@@ -900,7 +899,7 @@ const LogoPreview = ({ designConfig, initials }) => {
     // 简化的彭罗斯轮廓实现
     const centerX = 100;
     const centerY = 100;
-    const size = 30 + complexity * 5;
+    const size = 40 + complexity * 6;
     const triangles = [];
     
     // 生成五角星形状的初始三角形
@@ -920,7 +919,7 @@ const LogoPreview = ({ designConfig, initials }) => {
           points={`${centerX},${centerY} ${x1},${y1} ${x2},${y2}`}
           fill="none"
           stroke={colors.primary}
-          strokeWidth={3 + complexity/2}
+          strokeWidth={4 + complexity/2}
         />
       );
     }
@@ -1002,14 +1001,14 @@ const LogoPreview = ({ designConfig, initials }) => {
   // 渲染基元图案网格
   const renderPatternGrid = () => {
     const { rows, cols, total } = parseLayout();
-    const cellSize = 200 / Math.max(rows, cols, 1);
+    const cellSize = 280 / Math.max(rows, cols, 1);
     
     return (
       <div style={{
         display: 'grid',
         gridTemplateColumns: `repeat(${cols}, 1fr)`,
         gridTemplateRows: `repeat(${rows}, 1fr)`,
-        gap: '0px', // 完全消除间隔
+        gap: '0px',
         width: '100%',
         height: '100%',
         alignItems: 'center',
@@ -1022,14 +1021,14 @@ const LogoPreview = ({ designConfig, initials }) => {
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            overflow: 'hidden' // 防止图案溢出
+            overflow: 'hidden'
           }}>
             <svg 
               width={cellSize} 
               height={cellSize} 
               viewBox="0 0 200 200"
               style={{ 
-                transform: `scale(${scale}) rotate(${rotation}deg)`
+                transform: `rotate(${rotation}deg)`
               }}
             >
               {renderPattern()}
@@ -1047,11 +1046,11 @@ const LogoPreview = ({ designConfig, initials }) => {
         style={{
           display: 'inline-block',
           backgroundColor: colors.secondary,
-          padding: '2px', // 最小化内边距
+          padding: '2px',
           borderRadius: '8px',
           marginBottom: '20px',
-          width: '250px',
-          height: '250px',
+          width: '350px',
+          height: '350px',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
@@ -1061,8 +1060,8 @@ const LogoPreview = ({ designConfig, initials }) => {
       >
         {/* 基元图案网格 */}
         <div style={{ 
-          width: '230px', // 最大化内部容器大小
-          height: '200px',
+          width: '320px',
+          height: '280px',
           boxSizing: 'border-box'
         }}>
           {renderPatternGrid()}
@@ -1093,7 +1092,7 @@ const LogoPreview = ({ designConfig, initials }) => {
       </div>
       
       <div style={{ marginTop: '15px', fontSize: '13px', color: '#666' }}>
-        <p>图案: {patternNames[patternType] || "方形螺旋"} | 复杂度: {complexity}级 | 旋转: {rotation}° | 缩放: {scale.toFixed(2)}</p>
+        <p>图案: {patternNames[patternType] || "方形螺旋"} | 复杂度: {complexity}级 | 旋转: {rotation}°</p>
         <p>布局: {getLayout()} {initials && `(缩写: ${initials}, 长度: ${initials.length})`}</p>
         <div style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
           <div style={{ display: 'flex', alignItems: 'center' }}>
