@@ -1039,7 +1039,7 @@ const renderPatternGrid = () => {
       display: 'grid',
       gridTemplateColumns: `repeat(${cols}, 1fr)`,
       gridTemplateRows: `repeat(${rows}, 1fr)`,
-      gap: '0px',
+      gap: '8px',
       width: '100%',
       height: '100%',
       alignItems: 'center',
