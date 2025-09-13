@@ -1039,7 +1039,7 @@ const renderPatternGrid = () => {
       display: 'grid',
       gridTemplateColumns: `repeat(${cols}, 1fr)`,
       gridTemplateRows: `repeat(${rows}, 1fr)`,
-      gap: '0px',
+      gap: '10px',
       width: '100%',
       height: '100%',
       alignItems: 'center',
@@ -1052,7 +1052,7 @@ const renderPatternGrid = () => {
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          overflow: 'hidden'
+          overflow: 'visible'
         }}>
           <svg 
             width="100%" 
@@ -1093,8 +1093,8 @@ return (
     >
       {/* 基元图案网格 */}
       <div style={{ 
-        width: '330px', // 调整为容器大小
-        height: '310px', // 调整为容器大小
+        width: '350px', // 调整为容器大小
+        height: '330px', // 调整为容器大小
         boxSizing: 'border-box',
         overflow: 'visible' // 确保内容不被裁剪
       }}>
