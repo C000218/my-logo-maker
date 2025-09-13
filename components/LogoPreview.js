@@ -1093,8 +1093,8 @@ return (
     >
       {/* 基元图案网格 */}
       <div style={{ 
-        width: '330px', // 调整为容器大小
-        height: '32px', // 调整为容器大小
+        width: '350px', // 调整为容器大小
+        height: '350px', // 调整为容器大小
         boxSizing: 'border-box',
         overflow: 'visible' // 确保内容不被裁剪
       }}>
