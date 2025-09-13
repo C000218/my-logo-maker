@@ -1030,16 +1030,18 @@ const renderCircularResonator = (complexity, f1, f2, f3, colors) => {
     return { rows: rows || 1, cols: cols || 1, total: (rows || 1) * (cols || 1) };
   };
 
-  // 渲染基元图案网格
+// 渲染基元图案网格
 const renderPatternGrid = () => {
   const { rows, cols, total } = parseLayout();
+  const containerSize = 330; // 容器大小
+  const cellSize = containerSize / Math.max(rows, cols, 1);
   
   return (
     <div style={{
       display: 'grid',
       gridTemplateColumns: `repeat(${cols}, 1fr)`,
       gridTemplateRows: `repeat(${rows}, 1fr)`,
-      gap: '8px',
+      gap: '0px',
       width: '100%',
       height: '100%',
       alignItems: 'center',
@@ -1047,20 +1049,21 @@ const renderPatternGrid = () => {
     }}>
       {Array.from({ length: total }, (_, index) => (
         <div key={index} style={{
-          width: '100%',
-          height: '100%',
+          width: `${cellSize}px`,
+          height: `${cellSize}px`,
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          overflow: 'hidden'
+          overflow: 'visible' // 改为 visible 确保内容不被裁剪
         }}>
           <svg 
-            width="100%" 
-            height="100%" 
+            width={cellSize} 
+            height={cellSize} 
             viewBox="0 0 200 200"
-            preserveAspectRatio="xMidYMid meet"
+            preserveAspectRatio="xMidYMid meet" // 添加这个属性保持比例
             style={{ 
-              transform: `rotate(${rotation}deg)`
+              transform: `rotate(${rotation}deg)`,
+              overflow: 'visible' // 确保 SVG 内容不被裁剪
             }}
           >
             {renderPattern()}
@@ -1070,6 +1073,49 @@ const renderPatternGrid = () => {
     </div>
   );
 };
+
+return (
+  <div style={{ textAlign: 'center', padding: '20px' }}>
+    <div 
+      ref={logoRef}
+      style={{
+        display: 'inline-block',
+        backgroundColor: colors.secondary,
+        padding: '10px', // 增加内边距
+        borderRadius: '8px',
+        marginBottom: '10px',
+        width: '350px',
+        height: '350px',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        boxSizing: 'border-box',
+        overflow: 'visible' // 确保内容不被裁剪
+      }}
+    >
+      {/* 基元图案网格 */}
+      <div style={{ 
+        width: '330px', // 调整为容器大小
+        height: '310px', // 调整为容器大小
+        boxSizing: 'border-box',
+        overflow: 'visible' // 确保内容不被裁剪
+      }}>
+        {renderPatternGrid()}
+      </div>
+      
+      {/* 底部文本 */}
+      <div style={{ 
+        marginTop: '10px', // 增加上边距
+        color: colors.accent,
+        fontSize: '20px',
+        fontWeight: 'bold'
+      }}>
+        {footerText}
+      </div>
+    </div>
+  </div>
+);
 
   return (
     <div style={{ textAlign: 'center', padding: '20px' }}>
