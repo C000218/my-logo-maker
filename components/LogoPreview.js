@@ -1081,8 +1081,8 @@ return (
         padding: '10px', // 增加内边距
         borderRadius: '8px',
         marginBottom: '10px',
-        width: '400px',
-        height: '400px',
+        width: '450px',
+        height: '450px',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
@@ -1093,8 +1093,8 @@ return (
     >
       {/* 基元图案网格 */}
       <div style={{ 
-        width: '370px', // 调整为容器大小
-        height: '370px', // 调整为容器大小
+        width: '330px', // 调整为容器大小
+        height: '32px', // 调整为容器大小
         boxSizing: 'border-box',
         overflow: 'visible' // 确保内容不被裁剪
       }}>
