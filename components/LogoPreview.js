@@ -1081,7 +1081,7 @@ const renderPatternGrid = () => {
           padding: '2px',
           borderRadius: '8px',
           marginBottom: '10px',
-          width: '420px',
+          width: '450px',
           height: '400px',
           display: 'flex',
           flexDirection: 'column',
