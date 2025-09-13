@@ -1030,11 +1030,9 @@ const renderCircularResonator = (complexity, f1, f2, f3, colors) => {
     return { rows: rows || 1, cols: cols || 1, total: (rows || 1) * (cols || 1) };
   };
 
-// 渲染基元图案网格
+  // 渲染基元图案网格
 const renderPatternGrid = () => {
   const { rows, cols, total } = parseLayout();
-  const containerSize = 330; // 容器大小
-  const cellSize = containerSize / Math.max(rows, cols, 1);
   
   return (
     <div style={{
@@ -1049,21 +1047,20 @@ const renderPatternGrid = () => {
     }}>
       {Array.from({ length: total }, (_, index) => (
         <div key={index} style={{
-          width: `${cellSize}px`,
-          height: `${cellSize}px`,
+          width: '100%',
+          height: '100%',
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          overflow: 'visible' // 改为 visible 确保内容不被裁剪
+          overflow: 'hidden'
         }}>
           <svg 
-            width={cellSize} 
-            height={cellSize} 
+            width="100%" 
+            height="100%" 
             viewBox="0 0 200 200"
-            preserveAspectRatio="xMidYMid meet" // 添加这个属性保持比例
+            preserveAspectRatio="xMidYMid meet"
             style={{ 
-              transform: `rotate(${rotation}deg)`,
-              overflow: 'visible' // 确保 SVG 内容不被裁剪
+              transform: `rotate(${rotation}deg)`
             }}
           >
             {renderPattern()}
@@ -1084,8 +1081,8 @@ return (
         padding: '10px', // 增加内边距
         borderRadius: '8px',
         marginBottom: '10px',
-        width: '350px',
-        height: '350px',
+        width: '400px',
+        height: '400px',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
@@ -1117,96 +1114,6 @@ return (
   </div>
 );
 
-  return (
-    <div style={{ textAlign: 'center', padding: '20px' }}>
-      <div 
-        ref={logoRef}
-        style={{
-          display: 'inline-block',
-          backgroundColor: colors.secondary,
-          padding: '2px',
-          borderRadius: '8px',
-          marginBottom: '10px',
-          width: '450px',
-          height: '400px',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          boxSizing: 'border-box'
-        }}
-      >
-        {/* 基元图案网格 */}
-        <div style={{ 
-          width: '350px',
-          height: '330px',
-          boxSizing: 'border-box'
-        }}>
-          {renderPatternGrid()}
-        </div>
-        
-        {/* 底部文本 */}
-        <div style={{ 
-          marginTop: '5px',
-          color: colors.accent,
-          fontSize: '20px',
-          fontWeight: 'bold'
-        }}>
-          {footerText}
-        </div>
-      </div>
-      
-      <div>
-        <Space>
-          <Button 
-            type="primary" 
-            icon={<DownloadOutlined />} 
-            onClick={handleDownload}
-            size="large"
-          >
-            下载Logo
-          </Button>
-        </Space>
-      </div>
-      
-      <div style={{ marginTop: '15px', fontSize: '13px', color: '#666' }}>
-        <p>图案: {patternNames[patternType] || "方形螺旋"} | 复杂度: {complexity}级 | 旋转: {rotation}°</p>
-        <p>布局: {getLayout()} {initials && `(缩写: ${initials}, 长度: ${initials.length})`}</p>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <div style={{
-              width: '14px',
-              height: '14px',
-              backgroundColor: colors.primary,
-              marginRight: '4px',
-              borderRadius: '2px'
-            }}></div>
-            主色
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <div style={{
-              width: '14px',
-              height: '14px',
-              backgroundColor: colors.secondary,
-              marginRight: '4px',
-              borderRadius: '2px'
-            }}></div>
-            背景色
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <div style={{
-              width: '14px',
-              height: '14px',
-              backgroundColor: colors.accent,
-              marginRight: '4px',
-              borderRadius: '2px'
-            }}></div>
-            强调色
-          </div>
-        </div>
-      </div>
-    </div>
-  );
 };
 
 export default LogoPreview;
