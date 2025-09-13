@@ -194,7 +194,7 @@ export default function LogoGenerator() {
                 <p><strong>兴趣爱好:</strong> {logoData.hobbies}</p>
               </div>
               
-              // 在设计详情部分移除缩放比例的显示
+              
               <div>
                 <Title level={5}>图案配置</Title>
                 <Divider />
