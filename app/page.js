@@ -42,11 +42,12 @@ export default function LogoGenerator() {
       setDesignConfig({
         layout: "1x1",
         patternType: 0,
-        symmetry: 4,
         complexity: 2,
         feature1: 0,
         feature2: 0,
         feature3: 0,
+        rotation: 0,
+        scale: 0.8,
         colors: { primary: "#1890ff", secondary: "#f0f5ff", accent: "#096dd9" },
         footerText: "Bionic Metamaterials"
       });
@@ -100,6 +101,7 @@ export default function LogoGenerator() {
                 name="birthday"
                 label="生日"
                 rules={[{ required: true, message: '请选择您的生日' }]}
+                tooltip="生日将用于生成独特的图案参数"
               >
                 <DatePicker 
                   placeholder="请选择您的生日" 
@@ -161,7 +163,7 @@ export default function LogoGenerator() {
           {/* 右侧：Logo预览 */}
           <Card title="Logo预览">
             {designConfig ? (
-              <LogoPreview designConfig={designConfig} />
+              <LogoPreview designConfig={designConfig} initials={logoData?.initials} />
             ) : (
               <div style={{ 
                 height: '300px', 
@@ -172,7 +174,7 @@ export default function LogoGenerator() {
                 flexDirection: 'column'
               }}>
                 <div style={{ fontSize: '48px', marginBottom: '16px' }}>🎨</div>
-                <p>填写左侧表单并点击{"生成"}按钮</p>
+                <p>填写左侧表单并点击"生成"按钮</p>
                 <p>即可查看您的个性化Logo</p>
               </div>
             )}
@@ -195,9 +197,10 @@ export default function LogoGenerator() {
               <div>
                 <Title level={5}>图案配置</Title>
                 <Divider />
-                <p><strong>图案类型:</strong> {patternNames[designConfig.patternType] || "特殊十字"}</p>
-                <p><strong>对称性:</strong> {designConfig.symmetry}重</p>
+                <p><strong>图案类型:</strong> {patternNames[designConfig.patternType] || "方形螺旋"}</p>
                 <p><strong>复杂度:</strong> {designConfig.complexity}级</p>
+                <p><strong>旋转角度:</strong> {designConfig.rotation}°</p>
+                <p><strong>缩放比例:</strong> {designConfig.scale.toFixed(2)}</p>
                 <p><strong>布局:</strong> {designConfig.layout}</p>
               </div>
               
@@ -236,6 +239,15 @@ export default function LogoGenerator() {
                     <span>强调色: {designConfig.colors.accent}</span>
                   </div>
                 </div>
+              </div>
+
+              <div>
+                <Title level={5}>特征参数</Title>
+                <Divider />
+                <p><strong>特征1:</strong> {designConfig.feature1}</p>
+                <p><strong>特征2:</strong> {designConfig.feature2}</p>
+                <p><strong>特征3:</strong> {designConfig.feature3}</p>
+                <p><strong>底部文本:</strong> {designConfig.footerText}</p>
               </div>
             </div>
           </Card>

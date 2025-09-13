@@ -24,11 +24,12 @@ const LogoPreview = ({ designConfig, initials }) => {
   const { 
     layout = "1x1", 
     patternType = 0,
-    symmetry = 4,
     complexity = 2,
     feature1 = 0,
     feature2 = 0,
     feature3 = 0,
+    rotation = 0,
+    scale = 0.8,
     colors = { primary: "#1890ff", secondary: "#f0f5ff", accent: "#096dd9" },
     footerText = "Bionic Metamaterials"
   } = designConfig;
@@ -58,8 +59,545 @@ const LogoPreview = ({ designConfig, initials }) => {
     return <div>正在准备Logo预览...</div>;
   }
 
-  // 特殊十字图案
-  const renderSpecialCross = (symmetry, complexity, f1, f2, f3, colors) => {
+  // 方形螺旋
+  const renderSquareSpiral = (complexity, f1, f2, f3, colors) => {
+    const centerX = 100;
+    const centerY = 100;
+    const maxSize = 60 + complexity * 5;
+    const turns = 3 + Math.floor(complexity / 2);
+    const segments = 4 * turns;
+    const points = [];
+    
+    for (let i = 0; i <= segments; i++) {
+      const t = i / segments;
+      const size = maxSize * t;
+      const angle = (Math.PI / 2) * i;
+      
+      const x = centerX + size * Math.cos(angle);
+      const y = centerY + size * Math.sin(angle);
+      
+      points.push(`${x},${y}`);
+    }
+    
+    return (
+      <polyline 
+        points={points.join(' ')} 
+        fill="none" 
+        stroke={colors.primary} 
+        strokeWidth={3 + complexity / 2} 
+      />
+    );
+  };
+
+  // 手性柔顺机构
+  const renderChiralAuxetic = (complexity, f1, f2, f3, colors) => {
+    const centerX = 100;
+    const centerY = 100;
+    const radius = 30 + complexity * 5;
+    const nArms = 4 + Math.floor(f1 / 3);
+    const chirality = f2 > 5 ? 'right' : 'left';
+    
+    return (
+      <g>
+        {/* 中心圆 */}
+        <circle cx={centerX} cy={centerY} r={radius/3} fill={colors.accent} />
+        
+        {/* 绘制每个臂/韧带 */}
+        {Array.from({ length: nArms }).map((_, i) => {
+          const angle = (i * 2 * Math.PI / nArms) + (f3 * Math.PI / 180);
+          const chiralitySign = chirality === 'right' ? 1 : -1;
+          
+          // 计算臂的起点（在中心圆上）
+          const startX = centerX + (radius/3) * Math.cos(angle);
+          const startY = centerY + (radius/3) * Math.sin(angle);
+          
+          // 计算臂的终点（在外圆上）
+          const endRadius = radius * 1.5;
+          const endX = centerX + endRadius * Math.cos(angle);
+          const endY = centerY + endRadius * Math.sin(angle);
+          
+          // 计算控制点（使臂弯曲）
+          const controlRadius = (radius/3 + endRadius) / 2;
+          const controlAngle = angle + chiralitySign * (2 * Math.PI / nArms) / 3;
+          const controlX = centerX + controlRadius * Math.cos(controlAngle);
+          const controlY = centerY + controlRadius * Math.sin(controlAngle);
+          
+          // 创建二次贝塞尔曲线
+          return (
+            <path
+              key={i}
+              d={`M ${startX},${startY} Q ${controlX},${controlY} ${endX},${endY}`}
+              fill="none"
+              stroke={colors.primary}
+              strokeWidth={4 + complexity}
+            />
+          );
+        })}
+      </g>
+    );
+  };
+
+  // 多方框谐振器
+  const renderMultiSquareResonator = (complexity, f1, f2, f3, colors) => {
+    const centerX = 100;
+    const centerY = 100;
+    const nSquares = 3 + Math.floor(complexity / 2);
+    const baseSize = 30;
+    const gap = 10 + f1;
+    
+    return (
+      <g>
+        {Array.from({ length: nSquares }).map((_, i) => {
+          const size = baseSize + i * (baseSize + gap);
+          return (
+            <rect 
+              key={i}
+              x={centerX - size/2} 
+              y={centerY - size/2} 
+              width={size} 
+              height={size} 
+              fill="none" 
+              stroke={colors.primary} 
+              strokeWidth={3 + i} 
+            />
+          );
+        })}
+        
+        {/* 中心点 */}
+        <circle cx={centerX} cy={centerY} r={5 + complexity} fill={colors.accent} />
+      </g>
+    );
+  };
+
+  // 方形谐振环
+  const renderSquareResonator = (complexity, f1, f2, f3, colors) => {
+    const outerSize = 60 + complexity * 5;
+    const innerSize = 40 + complexity * 3;
+    const thickness = 8 + complexity * 2;
+    
+    return (
+      <g>
+        {/* 外环 */}
+        <rect x={100 - outerSize/2} y={100 - outerSize/2} 
+              width={outerSize} height={outerSize} 
+              fill="none" stroke={colors.primary} strokeWidth={thickness} />
+        
+        {/* 内环 */}
+        <rect x={100 - innerSize/2} y={100 - innerSize/2} 
+              width={innerSize} height={innerSize} 
+              fill="none" stroke={colors.primary} strokeWidth={thickness/2} />
+        
+        {/* 缺口 */}
+        <line x1={100 + outerSize/2 - 10} y1={100 - 5} 
+              x2={100 + outerSize/2 - 10} y2={100 + 5} 
+              stroke={colors.secondary} strokeWidth={thickness + 2} />
+        
+        <line x1={100 - outerSize/2 + 10} y1={100 - 5} 
+              x2={100 - outerSize/2 + 10} y2={100 + 5} 
+              stroke={colors.secondary} strokeWidth={thickness + 2} />
+      </g>
+    );
+  };
+
+  // 狄拉克锥结构
+  const renderDiracCone = (complexity, f1, f2, f3, colors) => {
+    const n = 3 + Math.floor(complexity / 2);
+    const a = 80 / n;
+    const dotSize = 3 + complexity;
+    
+    return (
+      <g>
+        {/* 生成A位点和B位点 */}
+        {Array.from({ length: n }).map((_, i) => {
+          return Array.from({ length: n }).map((_, j) => {
+            // A位点坐标
+            const xA = 100 + a * (i - (n-1)/2 + 0.5 * (j - (n-1)/2));
+            const yA = 100 + a * (j - (n-1)/2) * Math.sqrt(3)/2;
+            
+            // B位点坐标 (相对于A位点偏移)
+            const xB = xA + a/2;
+            const yB = yA + a * Math.sqrt(3)/6;
+            
+            return (
+              <g key={`${i}-${j}`}>
+                {/* A位点（蓝色） */}
+                <circle cx={xA} cy={yA} r={dotSize} fill={colors.primary} />
+                
+                {/* B位点（红色） */}
+                <circle cx={xB} cy={yB} r={dotSize} fill={colors.accent} />
+                
+                {/* 连接线（如果距离足够近） */}
+                <line 
+                  x1={xA} y1={yA} 
+                  x2={xB} y2={yB} 
+                  stroke={colors.primary} 
+                  strokeWidth={1 + complexity/2} 
+                />
+              </g>
+            );
+          });
+        })}
+      </g>
+    );
+  };
+
+  // Jerusalem十字
+  const renderJerusalemCross = (complexity, f1, f2, f3, colors) => {
+    const centerX = 100;
+    const centerY = 100;
+    const mainArmLength = 30 + complexity * 5;
+    const mainArmWidth = 8 + complexity;
+    const crossArmLength = 20 + complexity * 3;
+    const crossArmWidth = 6 + complexity;
+    const gap = 5 + f1;
+    
+    return (
+      <g>
+        {/* 主水平臂 */}
+        <rect 
+          x={centerX - mainArmLength/2} 
+          y={centerY - mainArmWidth/2} 
+          width={mainArmLength} 
+          height={mainArmWidth} 
+          fill={colors.primary} 
+        />
+        
+        {/* 主垂直臂 */}
+        <rect 
+          x={centerX - mainArmWidth/2} 
+          y={centerY - mainArmLength/2} 
+          width={mainArmWidth} 
+          height={mainArmLength} 
+          fill={colors.primary} 
+        />
+        
+        {/* 四个方向的十字臂 */}
+        {[
+          { x: centerX - mainArmLength/2 - crossArmLength + gap, y: centerY - crossArmWidth/2 }, // 左
+          { x: centerX + mainArmLength/2 - gap, y: centerY - crossArmWidth/2 }, // 右
+          { x: centerX - crossArmWidth/2, y: centerY - mainArmLength/2 - crossArmLength + gap }, // 上
+          { x: centerX - crossArmWidth/2, y: centerY + mainArmLength/2 - gap } // 下
+        ].map((pos, i) => (
+          <rect 
+            key={i}
+            x={pos.x} 
+            y={pos.y} 
+            width={i < 2 ? crossArmLength : crossArmWidth} 
+            height={i < 2 ? crossArmWidth : crossArmLength} 
+            fill={colors.primary} 
+          />
+        ))}
+      </g>
+    );
+  };
+
+  // 渔网图案
+  const renderFishnet = (complexity, f1, f2, f3, colors) => {
+    const baseUnitSize = 100;
+    const baseWireWidth = 16;
+    const unitCount = 2 + complexity;
+    const totalSize = baseUnitSize * unitCount;
+    const centerX = totalSize / 2;
+    const centerY = totalSize / 2;
+    
+    return (
+      <g transform={`translate(${100 - centerX}, ${100 - centerY})`}>
+        {/* 绘制每个单元的水平和垂直金属线 */}
+        {Array.from({ length: unitCount }).map((_, row) => {
+          return Array.from({ length: unitCount }).map((_, col) => {
+            const xOffset = col * baseUnitSize;
+            const yOffset = row * baseUnitSize;
+            
+            return (
+              <g key={`unit-${row}-${col}`}>
+                {/* 绘制水平金属线（在Y方向上下两侧） */}
+                <rect
+                  x={xOffset}
+                  y={yOffset}
+                  width={baseUnitSize}
+                  height={baseWireWidth}
+                  fill={colors.primary}
+                  stroke={colors.primary}
+                />
+                <rect
+                  x={xOffset}
+                  y={yOffset + baseUnitSize - baseWireWidth}
+                  width={baseUnitSize}
+                  height={baseWireWidth}
+                  fill={colors.primary}
+                  stroke={colors.primary}
+                />
+                
+                {/* 绘制垂直金属线（在X方向左右两侧） */}
+                <rect
+                  x={xOffset}
+                  y={yOffset}
+                  width={baseWireWidth}
+                  height={baseUnitSize}
+                  fill={colors.primary}
+                  stroke={colors.primary}
+                />
+                <rect
+                  x={xOffset + baseUnitSize - baseWireWidth}
+                  y={yOffset}
+                  width={baseWireWidth}
+                  height={baseUnitSize}
+                  fill={colors.primary}
+                  stroke={colors.primary}
+                />
+              </g>
+            );
+          });
+        })}
+        
+        {/* 根据对称性添加额外特征 */}
+        {f1 > 5 && (
+          <circle
+            cx={centerX}
+            cy={centerY}
+            r={baseUnitSize / 6}
+            fill={colors.accent}
+            stroke={colors.accent}
+          />
+        )}
+        
+        {/* 根据特征参数添加额外元素 */}
+        {f2 > 5 && (
+          <rect
+            x={centerX - baseUnitSize}
+            y={centerY - baseUnitSize}
+            width={baseUnitSize * 2}
+            height={baseUnitSize * 2}
+            fill="none"
+            stroke={colors.accent}
+            strokeWidth={baseWireWidth / 2}
+          />
+        )}
+      </g>
+    );
+  };
+
+  // 分形结构
+  const renderFractal = (complexity, f1, f2, f3, colors) => {
+    const centerX = 100;
+    const centerY = 100;
+    const maxDepth = Math.min(complexity, 4);
+    const initialSize = 60;
+    
+    // 递归绘制分形
+    const drawFractal = (x, y, size, depth) => {
+      if (depth > maxDepth) return null;
+      
+      const elements = [];
+      
+      // 绘制中心正方形
+      elements.push(
+        <rect 
+          key={`${x}-${y}-${depth}`}
+          x={x - size/2} 
+          y={y - size/2} 
+          width={size} 
+          height={size} 
+          fill={colors.primary} 
+          stroke={colors.accent} 
+          strokeWidth={1}
+          opacity={0.8 - depth * 0.2}
+        />
+      );
+      
+      // 递归绘制四个角上的小分形
+      if (depth < maxDepth) {
+        const newSize = size / 3;
+        const positions = [
+          { x: x - size, y: y - size },
+          { x: x + size, y: y - size },
+          { x: x - size, y: y + size },
+          { x: x + size, y: y + size }
+        ];
+        
+        positions.forEach(pos => {
+          elements.push(...drawFractal(pos.x, pos.y, newSize, depth + 1));
+        });
+      }
+      
+      return elements;
+    };
+    
+    return <g>{drawFractal(centerX, centerY, initialSize, 0)}</g>;
+  };
+
+  // 谢尔宾斯基地毯
+  const renderSierpinskiCarpet = (complexity, f1, f2, f3, colors) => {
+    const size = 100;
+    const level = Math.min(complexity, 3);
+    
+    const drawSierpinski = (x, y, size, level) => {
+      if (level === 0) return null;
+      
+      const newSize = size / 3;
+      const elements = [];
+      
+      // 中心空洞
+      elements.push(
+        <rect 
+          key={`${x}-${y}`} 
+          x={x + newSize} 
+          y={y + newSize} 
+          width={newSize} 
+          height={newSize} 
+          fill={colors.secondary} 
+          stroke={colors.secondary} 
+        />
+      );
+      
+      // 递归绘制8个周边区域
+      if (level > 1) {
+        const positions = [
+          [x, y], [x + newSize, y], [x + 2 * newSize, y],
+          [x, y + newSize], [x + 2 * newSize, y + newSize],
+          [x, y + 2 * newSize], [x + newSize, y + 2 * newSize], [x + 2 * newSize, y + 2 * newSize]
+        ];
+        
+        positions.forEach(([posX, posY]) => {
+          elements.push(...drawSierpinski(posX, posY, newSize, level - 1));
+        });
+      }
+      
+      return elements;
+    };
+    
+    return (
+      <g>
+        <rect x="50" y="50" width={size} height={size} fill={colors.primary} />
+        {drawSierpinski(50, 50, size, level)}
+      </g>
+    );
+  };
+
+  // 耶路撒冷十字架
+  const renderJerusalemCrossVariant = (complexity, f1, f2, f3, colors) => {
+    const centerX = 100;
+    const centerY = 100;
+    const centerSize = 30 + complexity * 3;
+    const armLength = 50 + complexity * 5;
+    const armWidth = 10 + complexity;
+    const gap = 5 + f1;
+    
+    return (
+      <g>
+        {/* 中心方块 */}
+        <rect 
+          x={centerX - centerSize/2} 
+          y={centerY - centerSize/2} 
+          width={centerSize} 
+          height={centerSize} 
+          fill={colors.primary} 
+          stroke={colors.accent} 
+          strokeWidth={2}
+        />
+        
+        {/* 四个方向的十字臂 */}
+        {[
+          { x: centerX - armWidth/2, y: centerY - centerSize/2 - armLength, width: armWidth, height: armLength }, // 上
+          { x: centerX + centerSize/2, y: centerY - armWidth/2, width: armLength, height: armWidth }, // 右
+          { x: centerX - armWidth/2, y: centerY + centerSize/2, width: armWidth, height: armLength }, // 下
+          { x: centerX - centerSize/2 - armLength, y: centerY - armWidth/2, width: armLength, height: armWidth } // 左
+        ].map((rect, i) => (
+          <rect 
+            key={i}
+            x={rect.x} 
+            y={rect.y} 
+            width={rect.width} 
+            height={rect.height} 
+            fill={colors.primary} 
+            stroke={colors.accent} 
+            strokeWidth={2}
+          />
+        ))}
+      </g>
+    );
+  };
+
+  // 希腊十字
+  const renderGreekCross = (complexity, f1, f2, f3, colors) => {
+    const centerX = 100;
+    const centerY = 100;
+    const armLength = 30 + complexity * 5;
+    const armWidth = 8 + complexity;
+    
+    return (
+      <g>
+        {/* 垂直臂 */}
+        <rect 
+          x={centerX - armWidth/2} 
+          y={centerY - armLength} 
+          width={armWidth} 
+          height={armLength * 2} 
+          fill={colors.primary} 
+        />
+        
+        {/* 水平臂 */}
+        <rect 
+          x={centerX - armLength} 
+          y={centerY - armWidth/2} 
+          width={armLength * 2} 
+          height={armWidth} 
+          fill={colors.primary} 
+        />
+        
+        {/* 装饰（如果复杂度高） */}
+        {complexity > 3 && (
+          <circle cx={centerX} cy={centerY} r={armWidth/2 + 2} fill={colors.accent} />
+        )}
+      </g>
+    );
+  };
+
+  // 方形梯度
+  const renderSquareGradient = (complexity, f1, f2, f3, colors) => {
+    const n = 5;
+    const period = 20;
+    const centerIdx = (n - 1) / 2;
+    const maxDist = 2 * centerIdx;
+    
+    return (
+      <g>
+        {Array.from({ length: n }).map((_, i) => {
+          return Array.from({ length: n }).map((_, j) => {
+            // 计算位置
+            const x = 100 + (i - centerIdx) * period;
+            const y = 100 + (j - centerIdx) * period;
+            
+            // 计算到中心的曼哈顿距离
+            const distFromCenter = Math.abs(i - centerIdx) + Math.abs(j - centerIdx);
+            
+            // 计算尺寸（从中心向外渐变）
+            const size = 15 - 10 * (distFromCenter / maxDist);
+            
+            // 计算不透明度
+            const opacity = 0.8 - 0.6 * (distFromCenter / maxDist);
+            
+            return (
+              <rect
+                key={`${i}-${j}`}
+                x={x - size/2}
+                y={y - size/2}
+                width={size}
+                height={size}
+                fill={colors.primary}
+                opacity={opacity}
+                stroke={colors.accent}
+                strokeWidth={1}
+              />
+            );
+          });
+        })}
+      </g>
+    );
+  };
+
+  // 特殊十字
+  const renderSpecialCross = (complexity, f1, f2, f3, colors) => {
     const centerX = 100;
     const centerY = 100;
     const branchLength = 40 + 5 * complexity;
@@ -119,241 +657,42 @@ const LogoPreview = ({ designConfig, initials }) => {
     );
   };
 
-  // 谢尔宾斯基地毯
-  const renderSierpinskiCarpet = (symmetry, complexity, f1, f2, f3, colors) => {
-    // 简化的谢尔宾斯基地毯实现
-    const size = 100;
-    const level = Math.min(complexity, 3);
-    
-    const drawSierpinski = (x, y, size, level) => {
-      if (level === 0) return null;
-      
-      const newSize = size / 3;
-      const elements = [];
-      
-      // 中心空洞
-      elements.push(
-        <rect key={`${x}-${y}`} x={x + newSize} y={y + newSize} width={newSize} height={newSize} 
-              fill={colors.secondary} stroke={colors.secondary} />
-      );
-      
-      // 递归绘制8个周边区域
-      if (level > 1) {
-        const positions = [
-          [x, y], [x + newSize, y], [x + 2 * newSize, y],
-          [x, y + newSize], [x + 2 * newSize, y + newSize],
-          [x, y + 2 * newSize], [x + newSize, y + 2 * newSize], [x + 2 * newSize, y + 2 * newSize]
-        ];
-        
-        positions.forEach(([posX, posY]) => {
-          elements.push(...drawSierpinski(posX, posY, newSize, level - 1));
-        });
-      }
-      
-      return elements;
-    };
-    
-    return (
-      <g>
-        <rect x="50" y="50" width={size} height={size} fill={colors.primary} />
-        {drawSierpinski(50, 50, size, level)}
-      </g>
-    );
-  };
-
-  // 方形谐振环
-  const renderSquareResonator = (symmetry, complexity, f1, f2, f3, colors) => {
-    const outerSize = 80;
-    const innerSize = 50;
-    const thickness = 8 + complexity * 2;
+  // 圆形谐振环
+  const renderCircularResonator = (complexity, f1, f2, f3, colors) => {
+    const outerRadius = 40 + complexity * 3;
+    const innerRadius = 25 + complexity * 2;
+    const thickness = 8 + complexity;
     
     return (
       <g>
         {/* 外环 */}
-        <rect x={100 - outerSize/2} y={100 - outerSize/2} 
-              width={outerSize} height={outerSize} 
-              fill="none" stroke={colors.primary} strokeWidth={thickness} />
+        <circle cx={100} cy={100} r={outerRadius} 
+                fill="none" stroke={colors.primary} strokeWidth={thickness} />
         
         {/* 内环 */}
-        <rect x={100 - innerSize/2} y={100 - innerSize/2} 
-              width={innerSize} height={innerSize} 
-              fill="none" stroke={colors.primary} strokeWidth={thickness/2} />
+        <circle cx={100} cy={100} r={innerRadius} 
+                fill="none" stroke={colors.primary} strokeWidth={thickness/2} />
         
         {/* 缺口 */}
-        <line x1={100 + outerSize/2 - 10} y1={100 - 5} 
-              x2={100 + outerSize/2 - 10} y2={100 + 5} 
+        <line x1={100 + outerRadius - 8} y1={100 - 5} 
+              x2={100 + outerRadius - 8} y2={100 + 5} 
               stroke={colors.secondary} strokeWidth={thickness + 2} />
         
-        <line x1={100 - outerSize/2 + 10} y1={100 - 5} 
-              x2={100 - outerSize/2 + 10} y2={100 + 5} 
+        <line x1={100 - outerRadius + 8} y1={100 - 5} 
+              x2={100 - outerRadius + 8} y2={100 + 5} 
               stroke={colors.secondary} strokeWidth={thickness + 2} />
       </g>
     );
   };
 
-// 渔网图案 - 根据Python代码重新实现，支持基于复杂度的单元数量变化
-const renderFishnet = (symmetry, complexity, f1, f2, f3, colors) => {
-  // 基础参数 - 与Python代码保持一致
-  const baseUnitSize = 100; // 基础单元大小（对应Python中的300nm）
-  const baseWireWidth = 16; // 基础线宽（对应Python中的50nm）
-  
-  // 根据复杂度调整单元数量
-  // 复杂度0: 2x2单元 (基础)
-  // 复杂度1: 3x3单元
-  // 复杂度2: 4x4单元
-  // 以此类推...
-  const unitCount = 2 + complexity;
-  
-  // 计算总大小
-  const totalSize = baseUnitSize * unitCount;
-  
-  // 中心点坐标
-  const centerX = totalSize / 2;
-  const centerY = totalSize / 2;
-  
-  return (
-    <g transform={`translate(${100 - centerX}, ${100 - centerY})`}>
-      {/* 绘制每个单元的水平和垂直金属线 */}
-      {Array.from({ length: unitCount }).map((_, row) => {
-        return Array.from({ length: unitCount }).map((_, col) => {
-          const xOffset = col * baseUnitSize;
-          const yOffset = row * baseUnitSize;
-          
-          return (
-            <g key={`unit-${row}-${col}`}>
-              {/* 绘制水平金属线（在Y方向上下两侧） */}
-              <rect
-                x={xOffset}
-                y={yOffset}
-                width={baseUnitSize}
-                height={baseWireWidth}
-                fill={colors.primary}
-                stroke={colors.primary}
-              />
-              <rect
-                x={xOffset}
-                y={yOffset + baseUnitSize - baseWireWidth}
-                width={baseUnitSize}
-                height={baseWireWidth}
-                fill={colors.primary}
-                stroke={colors.primary}
-              />
-              
-              {/* 绘制垂直金属线（在X方向左右两侧） */}
-              <rect
-                x={xOffset}
-                y={yOffset}
-                width={baseWireWidth}
-                height={baseUnitSize}
-                fill={colors.primary}
-                stroke={colors.primary}
-              />
-              <rect
-                x={xOffset + baseUnitSize - baseWireWidth}
-                y={yOffset}
-                width={baseWireWidth}
-                height={baseUnitSize}
-                fill={colors.primary}
-                stroke={colors.primary}
-              />
-            </g>
-          );
-        });
-      })}
-      
-      {/* 根据对称性添加额外特征 */}
-      {symmetry > 4 && (
-        <circle
-          cx={centerX}
-          cy={centerY}
-          r={baseUnitSize / 6}
-          fill={colors.accent}
-          stroke={colors.accent}
-        />
-      )}
-      
-      {/* 根据特征参数添加额外元素 */}
-      {f1 > 5 && (
-        <rect
-          x={centerX - baseUnitSize}
-          y={centerY - baseUnitSize}
-          width={baseUnitSize * 2}
-          height={baseUnitSize * 2}
-          fill="none"
-          stroke={colors.accent}
-          strokeWidth={baseWireWidth / 2}
-        />
-      )}
-    </g>
-  );
-};
-
-  // 方形螺旋
-  const renderSquareSpiral = (symmetry, complexity, f1, f2, f3, colors) => {
-    const centerX = 100;
-    const centerY = 100;
-    const maxSize = 80;
-    const turns = 3 + complexity;
-    const segments = 4 * turns;
-    const points = [];
-    
-    for (let i = 0; i <= segments; i++) {
-      const t = i / segments;
-      const size = maxSize * t;
-      const angle = (Math.PI / 2) * i;
-      
-      const x = centerX + size * Math.cos(angle);
-      const y = centerY + size * Math.sin(angle);
-      
-      points.push(`${x},${y}`);
-    }
-    
-    return (
-      <polyline 
-        points={points.join(' ')} 
-        fill="none" 
-        stroke={colors.primary} 
-        strokeWidth={3 + complexity / 2} 
-      />
-    );
-  };
-
-  // 嵌套方形
-  const renderNestedSquares = (symmetry, complexity, f1, f2, f3, colors) => {
-    const centerX = 100;
-    const centerY = 100;
-    const maxSize = 80;
-    const squaresCount = 3 + complexity;
-    
-    return (
-      <g>
-        {Array.from({ length: squaresCount }).map((_, i) => {
-          const size = maxSize - (i * maxSize / squaresCount);
-          return (
-            <rect 
-              key={i}
-              x={centerX - size/2} 
-              y={centerY - size/2} 
-              width={size} 
-              height={size} 
-              fill="none" 
-              stroke={colors.primary} 
-              strokeWidth={2 + i} 
-            />
-          );
-        })}
-      </g>
-    );
-  };
-
-  // 双C开口图案 - 根据Python代码修复
-  const renderDoubleCOpening = (symmetry, complexity, f1, f2, f3, colors) => {
+  // 双C开口图案
+  const renderDoubleCOpening = (complexity, f1, f2, f3, colors) => {
     const centerX = 100;
     const centerY = 100;
     const size = 40 + complexity * 5;
     const halfSize = size / 2;
-    const gapSize = size / 2; // 开口长度为边长的一半
-    const lineWidth = 5 + complexity; // 线宽
+    const gapSize = size / 2;
+    const lineWidth = 5 + complexity;
     
     // 左侧C型（开口向左朝外）
     const leftCenterX = centerX - halfSize;
@@ -458,62 +797,180 @@ const renderFishnet = (symmetry, complexity, f1, f2, f3, colors) => {
     );
   };
 
-  // 希腊十字
-  const renderGreekCross = (symmetry, complexity, f1, f2, f3, colors) => {
+  // 旋转三角形
+  const renderRotatingTriangles = (complexity, f1, f2, f3, colors) => {
     const centerX = 100;
     const centerY = 100;
-    const armLength = 30 + complexity * 5;
-    const armWidth = 8 + complexity;
+    const numTriangles = 3 + Math.floor(complexity / 2);
+    const size = 30 + complexity * 3;
+    const gap = 10 + f2;
     
     return (
       <g>
-        {/* 垂直臂 */}
-        <rect 
-          x={centerX - armWidth/2} 
-          y={centerY - armLength} 
-          width={armWidth} 
-          height={armLength * 2} 
-          fill={colors.primary} 
-        />
-        
-        {/* 水平臂 */}
-        <rect 
-          x={centerX - armLength} 
-          y={centerY - armWidth/2} 
-          width={armLength * 2} 
-          height={armWidth} 
-          fill={colors.primary} 
-        />
-        
-        {/* 装饰（如果复杂度高） */}
-        {complexity > 3 && (
-          <circle cx={centerX} cy={centerY} r={armWidth/2 + 2} fill={colors.accent} />
-        )}
+        {Array.from({ length: numTriangles }).map((_, i) => {
+          const angle = (i * 360 / numTriangles + f1 * 3.6) * Math.PI / 180;
+          const halfAngle = ((360 / numTriangles - gap) / 2) * Math.PI / 180;
+          
+          // 计算三角形的三个顶点
+          const x1 = centerX;
+          const y1 = centerY;
+          
+          const x2 = centerX + size * Math.cos(angle - halfAngle);
+          const y2 = centerY + size * Math.sin(angle - halfAngle);
+          
+          const x3 = centerX + size * Math.cos(angle + halfAngle);
+          const y3 = centerY + size * Math.sin(angle + halfAngle);
+          
+          return (
+            <polygon
+              key={i}
+              points={`${x1},${y1} ${x2},${y2} ${x3},${y3}`}
+              fill={colors.primary}
+              stroke={colors.accent}
+              strokeWidth={2}
+              opacity={0.7 + i * 0.1}
+            />
+          );
+        })}
       </g>
     );
+  };
+
+  // 光子晶体结构
+  const renderPhotonicCrystal = (complexity, f1, f2, f3, colors) => {
+    const n = 3 + Math.floor(complexity / 2);
+    const a = 80 / n;
+    const rodRadius = 5 + complexity;
+    
+    return (
+      <g>
+        {/* 创建方形晶格 */}
+        {Array.from({ length: n }).map((_, i) => {
+          return Array.from({ length: n }).map((_, j) => {
+            const x = 100 + a * (i - (n-1)/2);
+            const y = 100 + a * (j - (n-1)/2);
+            
+            return (
+              <circle
+                key={`${i}-${j}`}
+                cx={x}
+                cy={y}
+                r={rodRadius}
+                fill={colors.primary}
+                stroke={colors.accent}
+                strokeWidth={2}
+              />
+            );
+          });
+        })}
+      </g>
+    );
+  };
+
+  // 嵌套方框
+  const renderNestedSquares = (complexity, f1, f2, f3, colors) => {
+    const centerX = 100;
+    const centerY = 100;
+    const maxSize = 80;
+    const squaresCount = 3 + complexity;
+    
+    return (
+      <g>
+        {Array.from({ length: squaresCount }).map((_, i) => {
+          const size = maxSize - (i * maxSize / squaresCount);
+          return (
+            <rect 
+              key={i}
+              x={centerX - size/2} 
+              y={centerY - size/2} 
+              width={size} 
+              height={size} 
+              fill="none" 
+              stroke={colors.primary} 
+              strokeWidth={2 + i} 
+            />
+          );
+        })}
+      </g>
+    );
+  };
+
+  // 彭罗斯轮廓
+  const renderPenroseOutline = (complexity, f1, f2, f3, colors) => {
+    // 简化的彭罗斯轮廓实现
+    const centerX = 100;
+    const centerY = 100;
+    const size = 30 + complexity * 5;
+    const triangles = [];
+    
+    // 生成五角星形状的初始三角形
+    for (let i = 0; i < 5; i++) {
+      const angle1 = (i * 72 + f1 * 3.6) * Math.PI / 180;
+      const angle2 = ((i + 1) * 72 + f1 * 3.6) * Math.PI / 180;
+      
+      const x1 = centerX + size * Math.cos(angle1);
+      const y1 = centerY + size * Math.sin(angle1);
+      
+      const x2 = centerX + size * Math.cos(angle2);
+      const y2 = centerY + size * Math.sin(angle2);
+      
+      triangles.push(
+        <polygon
+          key={i}
+          points={`${centerX},${centerY} ${x1},${y1} ${x2},${y2}`}
+          fill="none"
+          stroke={colors.primary}
+          strokeWidth={3 + complexity/2}
+        />
+      );
+    }
+    
+    return <g>{triangles}</g>;
   };
 
   // 根据图案类型选择渲染函数
   const renderPattern = () => {
     switch(patternType) {
       case 0:
-        return renderSpecialCross(symmetry, complexity, feature1, feature2, feature3, colors);
+        return renderSquareSpiral(complexity, feature1, feature2, feature3, colors);
       case 1:
-        return renderSierpinskiCarpet(symmetry, complexity, feature1, feature2, feature3, colors);
+        return renderChiralAuxetic(complexity, feature1, feature2, feature3, colors);
       case 2:
-        return renderSquareResonator(symmetry, complexity, feature1, feature2, feature3, colors);
+        return renderMultiSquareResonator(complexity, feature1, feature2, feature3, colors);
       case 3:
-        return renderFishnet(symmetry, complexity, feature1, feature2, feature3, colors);
+        return renderSquareResonator(complexity, feature1, feature2, feature3, colors);
       case 4:
-        return renderSquareSpiral(symmetry, complexity, feature1, feature2, feature3, colors);
+        return renderDiracCone(complexity, feature1, feature2, feature3, colors);
       case 5:
-        return renderNestedSquares(symmetry, complexity, feature1, feature2, feature3, colors);
+        return renderJerusalemCross(complexity, feature1, feature2, feature3, colors);
       case 6:
-        return renderDoubleCOpening(symmetry, complexity, feature1, feature2, feature3, colors);
+        return renderFishnet(complexity, feature1, feature2, feature3, colors);
       case 7:
-        return renderGreekCross(symmetry, complexity, feature1, feature2, feature3, colors);
+        return renderFractal(complexity, feature1, feature2, feature3, colors);
+      case 8:
+        return renderSierpinskiCarpet(complexity, feature1, feature2, feature3, colors);
+      case 9:
+        return renderJerusalemCrossVariant(complexity, feature1, feature2, feature3, colors);
+      case 10:
+        return renderGreekCross(complexity, feature1, feature2, feature3, colors);
+      case 11:
+        return renderSquareGradient(complexity, feature1, feature2, feature3, colors);
+      case 12:
+        return renderSpecialCross(complexity, feature1, feature2, feature3, colors);
+      case 13:
+        return renderCircularResonator(complexity, feature1, feature2, feature3, colors);
+      case 14:
+        return renderDoubleCOpening(complexity, feature1, feature2, feature3, colors);
+      case 15:
+        return renderRotatingTriangles(complexity, feature1, feature2, feature3, colors);
+      case 16:
+        return renderPhotonicCrystal(complexity, feature1, feature2, feature3, colors);
+      case 17:
+        return renderNestedSquares(complexity, feature1, feature2, feature3, colors);
+      case 18:
+        return renderPenroseOutline(complexity, feature1, feature2, feature3, colors);
       default:
-        return renderSpecialCross(symmetry, complexity, feature1, feature2, feature3, colors);
+        return renderSquareSpiral(complexity, feature1, feature2, feature3, colors);
     }
   };
 
@@ -571,7 +1028,9 @@ const renderFishnet = (symmetry, complexity, f1, f2, f3, colors) => {
               width={cellSize} 
               height={cellSize} 
               viewBox="0 0 200 200"
-              style={{ transform: 'scale(1.1)' }} // 稍微放大图案
+              style={{ 
+                transform: `scale(${scale}) rotate(${rotation}deg)`
+              }}
             >
               {renderPattern()}
             </svg>
@@ -634,7 +1093,7 @@ const renderFishnet = (symmetry, complexity, f1, f2, f3, colors) => {
       </div>
       
       <div style={{ marginTop: '15px', fontSize: '13px', color: '#666' }}>
-        <p>图案: {patternNames[patternType] || "特殊十字"} | 对称性: {symmetry}重 | 复杂度: {complexity}级</p>
+        <p>图案: {patternNames[patternType] || "方形螺旋"} | 复杂度: {complexity}级 | 旋转: {rotation}° | 缩放: {scale.toFixed(2)}</p>
         <p>布局: {getLayout()} {initials && `(缩写: ${initials}, 长度: ${initials.length})`}</p>
         <div style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
           <div style={{ display: 'flex', alignItems: 'center' }}>
