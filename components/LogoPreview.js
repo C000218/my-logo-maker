@@ -169,54 +169,34 @@ const LogoPreview = ({ designConfig, initials }) => {
   };
 
 // 方形谐振环
-const renderSquareResonator = (complexity, f1, f2, f3, colors) => {
-  const outerSize = 70 + complexity * 6;
-  const innerSize = 50 + complexity * 4;
-  const thickness = 10 + complexity * 2;
-  const gapSize = 12; // 缺口大小
-  
-  // 计算外框和内框的坐标
-  const outerX = 100 - outerSize/2;
-  const outerY = 100 - outerSize/2;
-  const innerX = 100 - innerSize/2;
-  const innerY = 100 - innerSize/2;
-  
-  return (
-    <g>
-      {/* 外框 - 右侧中间有缺口 */}
-      <path
-        d={`
-          M ${outerX} ${outerY}
-          L ${outerX + outerSize - gapSize/2} ${outerY}
-          M ${outerX + outerSize + gapSize/2} ${outerY}
-          L ${outerX + outerSize} ${outerY}
-          L ${outerX + outerSize} ${outerY + outerSize}
-          L ${outerX} ${outerY + outerSize}
-          L ${outerX} ${outerY}
-        `}
-        fill="none"
-        stroke={colors.primary}
-        strokeWidth={thickness}
-      />
-      
-      {/* 内框 - 左侧中间有缺口 */}
-      <path
-        d={`
-          M ${innerX + innerSize} ${innerY}
-          L ${innerX + innerSize} ${innerY + innerSize}
-          L ${innerX} ${innerY + innerSize}
-          L ${innerX} ${innerY + gapSize/2}
-          M ${innerX} ${innerY - gapSize/2}
-          L ${innerX} ${innerY}
-          L ${innerX + innerSize} ${innerY}
-        `}
-        fill="none"
-        stroke={colors.primary}
-        strokeWidth={thickness/2}
-      />
-    </g>
-  );
-};
+  const renderSquareResonator = (complexity, f1, f2, f3, colors) => {
+    const outerSize = 70 + complexity * 6;
+    const innerSize = 50 + complexity * 4;
+    const thickness = 10 + complexity * 2;
+    
+    return (
+      <g>
+        {/* 外环 */}
+        <rect x={100 - outerSize/2} y={100 - outerSize/2} 
+              width={outerSize} height={outerSize} 
+              fill="none" stroke={colors.primary} strokeWidth={thickness} />
+        
+        {/* 内环 */}
+        <rect x={100 - innerSize/2} y={100 - innerSize/2} 
+              width={innerSize} height={innerSize} 
+              fill="none" stroke={colors.primary} strokeWidth={thickness/2} />
+        
+        {/* 缺口 */}
+        <line x1={100 + outerSize/2 - 12} y1={100 - 8} 
+              x2={100 + outerSize/2 - 12} y2={100 + 8} 
+              stroke={colors.secondary} strokeWidth={thickness + 2} />
+        
+        <line x1={100 - outerSize/2 + 12} y1={100 - 8} 
+              x2={100 - outerSize/2 + 12} y2={100 + 8} 
+              stroke={colors.secondary} strokeWidth={thickness + 2} />
+      </g>
+    );
+  };
   // 狄拉克锥结构
   const renderDiracCone = (complexity, f1, f2, f3, colors) => {
     const n = 3 + Math.floor(complexity / 2);
@@ -1051,45 +1031,45 @@ const renderCircularResonator = (complexity, f1, f2, f3, colors) => {
   };
 
   // 渲染基元图案网格
-  const renderPatternGrid = () => {
-    const { rows, cols, total } = parseLayout();
-    const cellSize = 280 / Math.max(rows, cols, 1);
-    
-    return (
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: `repeat(${cols}, 1fr)`,
-        gridTemplateRows: `repeat(${rows}, 1fr)`,
-        gap: '0px',
-        width: '100%',
-        height: '100%',
-        alignItems: 'center',
-        justifyItems: 'center'
-      }}>
-        {Array.from({ length: total }, (_, index) => (
-          <div key={index} style={{
-            width: `${cellSize}px`,
-            height: `${cellSize}px`,
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            overflow: 'hidden'
-          }}>
-            <svg 
-              width={cellSize} 
-              height={cellSize} 
-              viewBox="0 0 200 200"
-              style={{ 
-                transform: `rotate(${rotation}deg)`
-              }}
-            >
-              {renderPattern()}
-            </svg>
-          </div>
-        ))}
-      </div>
-    );
-  };
+const renderPatternGrid = () => {
+  const { rows, cols, total } = parseLayout();
+  
+  return (
+    <div style={{
+      display: 'grid',
+      gridTemplateColumns: `repeat(${cols}, 1fr)`,
+      gridTemplateRows: `repeat(${rows}, 1fr)`,
+      gap: '0px',
+      width: '100%',
+      height: '100%',
+      alignItems: 'center',
+      justifyItems: 'center'
+    }}>
+      {Array.from({ length: total }, (_, index) => (
+        <div key={index} style={{
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          overflow: 'hidden'
+        }}>
+          <svg 
+            width="100%" 
+            height="100%" 
+            viewBox="0 0 200 200"
+            preserveAspectRatio="xMidYMid meet"
+            style={{ 
+              transform: `rotate(${rotation}deg)`
+            }}
+          >
+            {renderPattern()}
+          </svg>
+        </div>
+      ))}
+    </div>
+  );
+};
 
   return (
     <div style={{ textAlign: 'center', padding: '20px' }}>
@@ -1100,9 +1080,9 @@ const renderCircularResonator = (complexity, f1, f2, f3, colors) => {
           backgroundColor: colors.secondary,
           padding: '2px',
           borderRadius: '8px',
-          marginBottom: '20px',
-          width: '400px',
-          height: '420px',
+          marginBottom: '10px',
+          width: '350px',
+          height: '350px',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
